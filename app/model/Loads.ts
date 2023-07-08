@@ -53,7 +53,7 @@ const Load = sequelize.define(
   export async function getNext(order_id: number) {
     const load = await Load.findOne({
       where: { order: order_id, timestamp: null }, // TODO eventually change to actual_d: null
-      order: ['index', 'ASC'] // findOne restituirà il solo elemento con index più alto, fra quelli selezionati nella where
+      order: ['index', 'ASC'] // findOne restituirà il solo elemento con index più basso, fra quelli selezionati nella where
     });
-    return load[0];
+    return load;
   }

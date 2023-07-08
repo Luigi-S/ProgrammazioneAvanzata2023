@@ -63,6 +63,6 @@ export async function updateToken(newTokenNumber: number, email: string) {
   );
 }
 
-export async function payToken() {
-    // TODO ? Non so se usarla così...
+export async function payToken(email: string, amount: number=1) {
+  await User.decrement(['token'], {by: amount, where: { email: email } });
 }

@@ -6,3 +6,7 @@ export const missing_token_message: string = "Bad Request - Missing JWT Token";
 export const invalid_token_message: string = "Forbidden - Invalid JWT Token";
 export const malformed_payload_message: string = "Bad Request - Malformed payload";
 export const unauthorized_message: string = "ERROR - Unauthorized";
+export const internal_server_error_message: string = "ERROR - Internal server error";
+export const food_created_message: string = "CREATED - Food data successfully created";
+export const food_updated_message: string = "SUCCESS - Food data successfully updated";
+export const unexisting_food_message : string = "Bad Request - Food not in database"

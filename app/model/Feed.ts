@@ -1,4 +1,5 @@
 import { DataTypes } from "sequelize";
+import * as Message from '../utils/messages'
 
 import { SingletonDB } from "./sequelize";
 const sequelize = SingletonDB.getInstance().getConnection();
@@ -26,6 +27,10 @@ export const Food = sequelize.define(
   }
 );
 
+export async function createFood (name: string, quantity: number) {
+  const retval = await Food.create({name:name, quantity:quantity});
+  return retval;
+}
 
 export async function getQuantity(id: number) {
   const quantity = await Food.findOne({
@@ -49,31 +54,30 @@ export async function getFoodByName(name: string) {
     return food;
 }
 
-export async function updateQuantity(newQuantity: number, id: number) {
+
+
+export async function updateFood( id: number, quantity?: number, name?: string) {
+  let newVal;
+  if(name){
+    newVal = {name: name};
+  }
+  if(quantity){
+    newVal = {quantity: quantity};
+  }
+  if(newVal===undefined){
+      throw Error(Message.bad_request_msg)
+  }
   const food = await Food.update(
-    {
-      quantity: newQuantity,
-    },
+    newVal,
     {
       where: { id: id },
     }
   );
+  return food;
 }
 
 
-// TODO rivedere
+// TODO aggiungere check su quantity disponibile?
 export async function takeFood(quantity: number, id: number) {
-    let oldQuantity : any = await getQuantity(id);
-    if( oldQuantity.quantity >= quantity){
-        const newQuantity =  oldQuantity.quantity - quantity;
-        const food = await Food.update(
-            {
-              quantity: newQuantity,
-            },
-            {
-              where: { id: id },
-            }
-          );
-        return true;
-    } else{ return false;}
+  await Food.decrement(['quantity'], {by: quantity, where: { id: id } });
 }

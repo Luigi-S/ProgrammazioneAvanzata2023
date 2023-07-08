@@ -1,13 +1,46 @@
 import * as express from 'express';
 import * as Middleware from './middleware/cor'
 
+import * as FoodController from './controller/food_controller'
+
+
 const PORT = 8080;
 const HOST = '0.0.0.0';
 
 const app = express();
-// app.use('/', require("./routes/pages"));
 
 app.use(express.json());
+// TODO remove, probabilemnte sovrabbondante, ho fatto già il middleware
+/*
+app.use((err: Error, req: any, res: any, next: any) => {
+  if (err instanceof SyntaxError) {
+    let new_err: ErrorWithStatus = getErrorWithStatus(Error(Message.malformed_payload_message));
+    res.status(new_err.status).json(new_err.err.message);
+  }
+  next();
+});
+*/
+
+// ROTTE
+// 1) POST /food -> creazione alimento + name, quantity
+app.post('/food', Middleware.auth, Middleware.validNewFood, Middleware.error_handling, function (req: any, res: any) {    
+  FoodController.createFood(req, res);
+});
+
+// 2) PUT /food/ <id> -> modifica alimento <id> + name, quantity
+app.put('/food/:id', Middleware.auth, Middleware.validUpdFood, Middleware.error_handling, function (req: any, res: any) {    
+  FoodController.updateFood(req, res);
+});
+
+// 3) POST /order -> creazione ordine + list[ food_id, requested_quantity, index(?)]
+// 4) POST /order/<id_order> -> Presa in carico ordine <id_order>
+// 5) GET /order/<id_order> -> dati ordine <id_order>
+// 6) GET /order/list -> <NO-JWT> ottenere lista degli ordini, si può selezionare un periodo + start, end
+// 7) POST /load/<id_order> -> carico alimento per ordine <id_order> + food_id, quantity
+
+// 8) POST /admin/token -> re-impostare il numero token di un utente + user_id, token_amount
+
+
 
 
 app.get('/canidi', (req, res) => {

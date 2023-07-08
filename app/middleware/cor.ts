@@ -15,6 +15,16 @@ export const payload = [
     RequestMiddleware.checkJSONPayload
 ];
 
+export const validNewFood = [
+    // TODO controllare se UNIQUE di name funziona, in caso contrario, aggiungere middleware per controllo nome originale
+    RequestMiddleware.checkQuantityPositive
+];
+
+export const validUpdFood = [
+    // TODO controllare se UNIQUE di name funziona, in caso contrario, aggiungere middleware per controllo nome originale
+    RequestMiddleware.checkFoodExists,
+    RequestMiddleware.checkQuantityPositive
+];
 
 export const any_other = [
     RequestMiddleware.notFound

@@ -1,4 +1,3 @@
-import { stat } from 'fs';
 import * as Message from './messages'
 
 var HttpStatus = require('http-status-codes');
@@ -24,6 +23,12 @@ export function getErrorWithStatus(err: Error): ErrorWithStatus{
             break;
         case Message.unauthorized_message:
             status = HttpStatus.UNAUTH;
+            break;
+        case Message.internal_server_error_message:
+            status = HttpStatus.INTERNAL_SERVER_ERROR;
+            break;
+        case Message.unexisting_food_message:
+            status = HttpStatus.BAD_REQUEST;
             break;
         default:
             status = HttpStatus.BAD_REQUEST;
