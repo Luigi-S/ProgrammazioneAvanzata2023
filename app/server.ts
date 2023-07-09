@@ -2,6 +2,7 @@ import * as express from 'express';
 import * as Middleware from './middleware/cor'
 
 import * as FoodController from './controller/food_controller'
+import * as OrderController from './controller/order_controller'
 
 
 const PORT = 8080;
@@ -33,8 +34,18 @@ app.put('/food/:id', Middleware.auth, Middleware.validUpdFood, Middleware.error_
 });
 
 // 3) POST /order -> creazione ordine + list[ food_id, requested_quantity, index(?)]
+// TODO probabilmente singola rotta più complessa(?)
+app.post('/order', Middleware.auth, Middleware.validOrder, Middleware.error_handling, function (req: any, res: any) {    
+  OrderController.createOrder(req, res);
+});
+
 // 4) POST /order/<id_order> -> Presa in carico ordine <id_order>
+app.post('/order/:id', Middleware.auth, Middleware.takeOrder, Middleware.error_handling, function (req: any, res: any) {    
+  OrderController.takeOrder(req, res);
+});
+
 // 5) GET /order/<id_order> -> dati ordine <id_order>
+
 // 6) GET /order/list -> <NO-JWT> ottenere lista degli ordini, si può selezionare un periodo + start, end
 // 7) POST /load/<id_order> -> carico alimento per ordine <id_order> + food_id, quantity
 

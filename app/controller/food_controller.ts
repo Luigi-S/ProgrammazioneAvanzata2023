@@ -4,7 +4,7 @@ import * as Message from '../utils/messages'
 
 var HttpStatus = require('http-status-codes');
 
-export async function createFood(req:any, res:any){
+export function createFood(req:any, res:any){
     const name: string =  req.body.name;
     const quantity: number =  req.body.quantity;
     Feed.createFood(name, quantity).then((food) => {
@@ -19,7 +19,7 @@ export async function checkFoodExists(id: number){
     return food;
 }
 
-export async function updateFood(req:any, res:any){
+export function updateFood(req:any, res:any){
     const id: number = req.params.id
     const name: string =  req.body.name;
     const quantity: number =  req.body.quantity;

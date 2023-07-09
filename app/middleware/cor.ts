@@ -1,5 +1,8 @@
 import * as RequestMiddleware from './request_middleware';
 import * as AuthMiddleware from './auth_middleware';
+import * as OrdersMiddleware from './orders_middleware';
+import * as FeedMiddleware from './feed_middleware';
+
 
 /// file contente le catene di middleware da impiegare
 export const auth = [
@@ -17,14 +20,22 @@ export const payload = [
 
 export const validNewFood = [
     // TODO controllare se UNIQUE di name funziona, in caso contrario, aggiungere middleware per controllo nome originale
-    RequestMiddleware.checkQuantityPositive
+    FeedMiddleware.checkQuantityPositive
 ];
 
 export const validUpdFood = [
     // TODO controllare se UNIQUE di name funziona, in caso contrario, aggiungere middleware per controllo nome originale
-    RequestMiddleware.checkFoodExists,
-    RequestMiddleware.checkQuantityPositive
+    FeedMiddleware.checkFoodExists,
+    FeedMiddleware.checkQuantityPositive
 ];
+
+export const validOrder = [
+    OrdersMiddleware.checkValidOrder
+]
+
+export const takeOrder = [
+    OrdersMiddleware.checkOrderExistsAndNotStarted
+]
 
 export const any_other = [
     RequestMiddleware.notFound

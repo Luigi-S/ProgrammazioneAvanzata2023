@@ -5,6 +5,10 @@ import {Order} from './Orders';
 import { SingletonDB } from "./sequelize";
 const sequelize = SingletonDB.getInstance().getConnection();
 
+export interface LoadSchema{
+  food: number; order: number; quantity: number;
+}
+
 const Load = sequelize.define(
     "loads",
     {
@@ -47,6 +51,19 @@ const Load = sequelize.define(
   Order.hasMany(Load, {
     foreignKey: 'order'
   });
+
+  export async function createLoads(loads: Array<{food: number, order: number, requested_q: number, index: number,}>){
+    const retval = await Load.bulkCreate(
+      loads,
+      {validate: true}
+    ) 
+    return retval;    
+  }
+
+  export async function createLoad(food: number, order: number, quantity: number, index: number){
+    const retval = await Load.create({food:food, order:order, requested_q:quantity, index:index});
+    return retval;
+  }
 
   // next
   // find the lowest INDEX between all the LOADS with ORDER= ORDER_ID and TIMESTAMP=NULL

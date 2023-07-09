@@ -37,6 +37,22 @@ export const Order = sequelize.define(
     }
   );
   
+  export async function getOrder(id: number) {
+    const order = await Order.findOne({
+      where: { id: id },
+    });
+    return order;
+  }
+
+  export async function createOrder(){
+    const retval = await Order.create({state: OrderState.CREATO});
+    return retval;
+  }
+
+  export async function destroyOrder(id: number){
+    const count = await Order.destroy({ where: { id: id } }); 
+  }
+  
 
   export async function setState(id: number, state: OrderState) {
     const order = await Order.update(
@@ -47,4 +63,5 @@ export const Order = sequelize.define(
           where: { id: id },
         }
       );
+      return order;
   }
