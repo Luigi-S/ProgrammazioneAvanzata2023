@@ -4,6 +4,7 @@ export const order_created_message: string = "CREATED - Order data successfully 
 export const order_taken_message: string = "SUCCESS - Order successfully taken";
 export const food_updated_message: string = "SUCCESS - Food data successfully updated";
 export const success_load_message: string = "SUCCESS - Load data successfully added";
+export const token_updated_message: string = "SUCCESS - User's token amount updated successfully";
 
 // ERRORS
 export const not_found_msg: string = "ERROR - Not found";

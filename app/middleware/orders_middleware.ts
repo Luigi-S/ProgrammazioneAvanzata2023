@@ -4,6 +4,8 @@ import * as Loads from '../model/Loads'
 import * as Message from '../utils/messages'
 import * as OrderController from '../controller/order_controller'
 
+const DATE_FORMATS = ['DD-MM-YYYY', 'DD/MM/YYYY'];
+
 export function checkValidOrder(req: any, res: any, next: any): void{
     const loads : Array<{food: number, quantity: number}> =  req.body.loads;
     if(!loads.length){
@@ -33,7 +35,7 @@ export function checkValidOrder(req: any, res: any, next: any): void{
 export function checkOrderExists(req: any, res: any, next: any): void{
     Orders.getOrder(req.params.id).then((value:any)=>{
         if(value){
-            req.order = value;
+            req.body.order = value;
             next();
         }else{
             // order does not exist
@@ -43,7 +45,7 @@ export function checkOrderExists(req: any, res: any, next: any): void{
 }
 
 export function checkOrderNotStarted(req: any, res: any, next: any): void{
-    if(req.order.state==Orders.OrderState.CREATO){
+    if(req.body.order.state==Orders.OrderState.CREATO){
         next();
     }else{
         // richiesta già presa in carico, completata o fallita -> non è possibile prenderela in carico
@@ -53,8 +55,8 @@ export function checkOrderNotStarted(req: any, res: any, next: any): void{
 
 export function checkIfNext(req: any, res: any, next: any): void{
     Loads.getNext(req.params.id).then((value:any)=>{
-        if(value.food.id === req.food){
-            req.food = value.food;
+        if(value.food.id === req.body.food){
+            req.body.food = value.food;
             next();
         }else{
             OrderController.failOrder(value.order);
@@ -65,6 +67,7 @@ export function checkIfNext(req: any, res: any, next: any): void{
 
 export function checkActualQuantity(req: any, res: any, next: any): void{ 
     require('dotenv').config();
+    req =req.body;
     const N: number = parseInt(process.env.N as string)/100;
     const min_accepted = req.food.requested_q*(1-N);
     const max_accepted = req.food.requested_q*(1+N);
@@ -77,10 +80,25 @@ export function checkActualQuantity(req: any, res: any, next: any): void{
 }
 
 export function checkStoredQuantity(req: any, res: any, next: any): void{ 
-    if(req.quantity<=req.food.quantity){
+    if(req.body.quantity<=req.body.food.quantity){
         next();
     }else{
         // TODO anche in questo caso è FALLITO?
         next(Error(Message.not_enough_stored_message));
+    }
+}
+
+export function checkValidPeriod(req: any, res: any, next: any): void{ 
+    const moment = require('moment');
+    const start: string = req.start;
+    const end: string = req.end;
+    if((moment(start, DATE_FORMATS, true).isValid() || !start) &&
+        (moment(end, DATE_FORMATS, true).isValid() || !end)){
+        if(start && end && Date.parse(end)<=Date.parse(start)){
+            next(Error(Message.bad_request_msg));    
+        }
+        next();
+    }else{
+        next(Error(Message.bad_request_msg));
     }
 }

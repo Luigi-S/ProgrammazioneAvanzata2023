@@ -1,6 +1,7 @@
 import * as RequestMiddleware from './request_middleware';
 import * as AuthMiddleware from './auth_middleware';
 import * as OrdersMiddleware from './orders_middleware';
+import * as AdminMiddleware from './admin_middleware';
 import * as FeedMiddleware from './feed_middleware';
 
 
@@ -8,14 +9,25 @@ import * as FeedMiddleware from './feed_middleware';
 export const auth = [
     AuthMiddleware.checkAuthHeader, 
     AuthMiddleware.checkToken, 
-    AuthMiddleware.verifyAndAuthenticate
+    AuthMiddleware.verifyAndAuthenticate,
+    AuthMiddleware.checkTokenAmount
 ];
 
-export const isAdmin = auth.concat([AuthMiddleware.isAdmin]);
+export const isAdmin = [
+    AuthMiddleware.checkAuthHeader, 
+    AuthMiddleware.checkToken, 
+    AuthMiddleware.verifyAndAuthenticate,
+    AuthMiddleware.isAdmin
+];
+
+export const updToken = [
+    AdminMiddleware.checkUserExists,
+    AdminMiddleware.checkAmountPositive
+];
 
 export const payload = [
     RequestMiddleware.checkPayloadHeader,
-    RequestMiddleware.checkJSONPayload
+    // RequestMiddleware.checkJSONPayload
 ];
 
 export const validNewFood = [
@@ -43,7 +55,7 @@ export const orderState = [
 ]
 
 export const validPeriod = [
-    RequestMiddleware.checkValidPeriod
+    OrdersMiddleware.checkValidPeriod
 ];
 
 export const addLoad = [

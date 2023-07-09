@@ -16,7 +16,7 @@ export function createOrder(req:any, res:any){
             arr.push({food: value.food, order: order.id, requested_q: value.quantity, index:index});
         });
         Loads.createLoads(arr).then((loads) => {
-            Users.payToken(req.user.email);
+            Users.payToken(req.body.user.email);
             res.status(HttpStatus.CREATED).json({message: Message.order_created_message, order: order, loads: loads});
         }).catch((err) => {
             Orders.destroyOrder(order.id).then((value)=>{
@@ -35,16 +35,16 @@ export function createOrder(req:any, res:any){
 
 export function takeOrder(req:any, res:any){
     Orders.setState(req.params.id, Orders.OrderState.IN_ESECUZIONE).then((value)=>{
-        Users.payToken(req.user.email);
+        Users.payToken(req.body.user.email);
         res.status(HttpStatus.OK).json({message: Message.order_taken_message, order: value});
     });
 }
 
 export function getOrderState(req:any, res:any){
-    const order: any = req.order.state;
+    const order: any = req.body.order;
     if(order.state == Orders.OrderState.COMPLETATO){
         Loads.getLoadsByOrder(order.id).then((value)=>{
-            Users.payToken(req.user.email);
+            Users.payToken(req.body.user.email);
             res.status(HttpStatus.OK).json({order_id: order.id, loads: value});
         });
     }else if(order.state == Orders.OrderState.IN_ESECUZIONE){
@@ -58,17 +58,17 @@ export function getOrderState(req:any, res:any){
                     diff_q: (elem.requested_q-elem.actual_q)
                 });
             });
-            Users.payToken(req.user.email);
+            Users.payToken(req.body.user.email);
             res.status(HttpStatus.OK).json({order_id: order.id, duration: (order.finish - order.start), loads: loads});
         });
     }else{
-        Users.payToken(req.user.email);
+        Users.payToken(req.body.user.email);
         res.status(HttpStatus.OK).json({order_id: order.id, message: Message.no_loads_msg, loads: null });
     }
 }
 
 export function getOrderList(req:any, res:any){
-    Loads.getLoadsInPeriod(req.start, req.end).then((value)=>{
+    Loads.getLoadsInPeriod(req.query.start, req.query.end).then((value)=>{
         let retval ={};
 
         value.forEach((elem: any)=>{
@@ -89,8 +89,7 @@ export function getOrderList(req:any, res:any){
                     loads:[load]};
             }
         });
-        Users.payToken(req.user.email);
-        res.status(HttpStatus.OK).json({start: req.start, end: req.end, loads: retval});
+        res.status(HttpStatus.OK).json({start: req.query.start, end: req.query.end, loads: retval});
     });
 }
 
@@ -105,8 +104,9 @@ export async function completeOrder(order_id: number){
 }
 
 async function addLoadAsync(req:any, res:any){
-    const load: any = await Loads.doLoad(req.order.id, req.food.id, req.quantity);
-    await Feed.takeFood(req.quantity, req.food.id);
+    const body = req.body;
+    const load: any = await Loads.doLoad(body.order.id, body.food.id, body.quantity);
+    await Feed.takeFood(body.quantity, body.food.id);
     const nxt: any = await Loads.getNext(req.params.id);
     if(nxt.index === load.index){
         await completeOrder(req.params.id);
@@ -115,7 +115,7 @@ async function addLoadAsync(req:any, res:any){
 
 export function addLoad(req:any, res:any) {
     addLoadAsync(req, res).then(()=>{
-        Users.payToken(req.user.email);
+        Users.payToken(req.body.user.email);
         res.status(HttpStatus.OK).json({message: Message.success_load_message});
     });
 }
