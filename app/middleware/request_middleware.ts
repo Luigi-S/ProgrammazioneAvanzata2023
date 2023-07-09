@@ -1,6 +1,7 @@
 import { ErrorWithStatus, getErrorWithStatus } from '../utils/errors';
 import * as Message from '../utils/messages'
 
+const DATE_FORMATS = ['DD-MM-YYYY', 'DD/MM/YYYY'];
 
 export function notFound(req: any, res: any, next: any) {
     next(Error(Message.not_found_msg));
@@ -17,6 +18,21 @@ export function checkJSONPayload(req: any, res: any, next: any): void{
         next();
     } catch (error) { 
         next(Error(Message.malformed_payload_message))
+    }
+}
+
+export function checkValidPeriod(req: any, res: any, next: any): void{ 
+    const moment = require('moment');
+    const start: string = req.start;
+    const end: string = req.end;
+    if((moment(start, DATE_FORMATS, true).isValid() || !start) &&
+        (moment(end, DATE_FORMATS, true).isValid() || !end)){
+        if(start && end && Date.parse(end)<=Date.parse(start)){
+            next(Error(Message.bad_request_msg));    
+        }
+        next();
+    }else{
+        next(Error(Message.bad_request_msg));
     }
 }
 

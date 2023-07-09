@@ -34,8 +34,17 @@ export const validOrder = [
 ]
 
 export const takeOrder = [
-    OrdersMiddleware.checkOrderExistsAndNotStarted
+    OrdersMiddleware.checkOrderExists,
+    OrdersMiddleware.checkOrderNotStarted
 ]
+
+export const orderState = [
+    OrdersMiddleware.checkOrderExists
+]
+
+export const validPeriod = [
+    RequestMiddleware.checkValidPeriod
+];
 
 export const any_other = [
     RequestMiddleware.notFound

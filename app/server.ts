@@ -45,18 +45,21 @@ app.post('/order/:id', Middleware.auth, Middleware.takeOrder, Middleware.error_h
 });
 
 // 5) GET /order/<id_order> -> dati ordine <id_order>
+app.get('/order/:id', Middleware.auth, Middleware.orderState,Middleware.error_handling, function (req: any, res: any) {    
+  OrderController.getOrderState(req,res);
+});
 
 // 6) GET /order/list -> <NO-JWT> ottenere lista degli ordini, si può selezionare un periodo + start, end
+app.get('/order/list', Middleware.payload, Middleware.validPeriod, function (req: any, res: any) {
+  OrderController.getOrderList(req, res);
+});
+
 // 7) POST /load/<id_order> -> carico alimento per ordine <id_order> + food_id, quantity
+
+
 
 // 8) POST /admin/token -> re-impostare il numero token di un utente + user_id, token_amount
 
-
-
-
-app.get('/canidi', (req, res) => {
-  res.send('Hello World');
-});
 
 
 /** 

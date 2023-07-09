@@ -28,15 +28,11 @@ export function checkValidOrder(req: any, res: any, next: any): void{
     next();
 }
 
-export function checkOrderExistsAndNotStarted(req: any, res: any, next: any): void{
+export function checkOrderExists(req: any, res: any, next: any): void{
     Orders.getOrder(req.params.id).then((value:any)=>{
         if(value){
-            if(value.state==Orders.OrderState.CREATO){
-                next();
-            }else{
-                // richiesta già presa in carico, completata o fallita -> non è possibile prenderela in carico
-                next(Error(Message.already_taken_order_message));
-            }
+            req.order = value;
+            next();
         }else{
             // order does not exist
             next(Error(Message.bad_request_msg));
@@ -44,3 +40,11 @@ export function checkOrderExistsAndNotStarted(req: any, res: any, next: any): vo
     });
 }
 
+export function checkOrderNotStarted(req: any, res: any, next: any): void{
+    if(req.order.state==Orders.OrderState.CREATO){
+        next();
+    }else{
+        // richiesta già presa in carico, completata o fallita -> non è possibile prenderela in carico
+        next(Error(Message.already_taken_order_message));
+    }
+}

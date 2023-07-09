@@ -3,7 +3,9 @@ import {Food} from './Feed';
 import {Order} from './Orders';
 
 import { SingletonDB } from "./sequelize";
+
 const sequelize = SingletonDB.getInstance().getConnection();
+const { Op } = require("sequelize");
 
 export interface LoadSchema{
   food: number; order: number; quantity: number;
@@ -73,4 +75,30 @@ const Load = sequelize.define(
       order: ['index', 'ASC'] // findOne restituirà il solo elemento con index più basso, fra quelli selezionati nella where
     });
     return load;
+  }
+
+  export async function getLoadsByOrder(order_id: number) {
+    const retval = await Load.findAll({
+      where: { order: order_id},
+    });
+    return retval;
+  }
+
+  export async function getCompletedOrder(order_id: number) {
+    const retval = await Load.findAll({
+      where: { order: order_id, timestamp: {[Op.ne]:null} },
+    });
+    return retval;
+  }
+
+  export async function getLoadsInPeriod(start?: Date, end?: Date) {
+    const filter = (start&&end)? { timestamp: {[Op.between]:[start,end]} } :
+      (!start && !end)? { } : 
+      (start)? { timestamp: {[Op.gt]: start} } : { timestamp: {[Op.lt]: end} }
+    const retval = await Load.findAll({
+      where: filter,
+      group: 'order',
+      include: Order
+    });
+    return retval;
   }

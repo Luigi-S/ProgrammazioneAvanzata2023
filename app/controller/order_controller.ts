@@ -39,3 +39,57 @@ export function takeOrder(req:any, res:any){
         res.status(HttpStatus.OK).json({message: Message.order_taken_message, order: value});
     });
 }
+
+export function getOrderState(req:any, res:any){
+    const order: any = req.order.state;
+    if(order.state == Orders.OrderState.COMPLETATO){
+        Loads.getLoadsByOrder(order.id).then((value)=>{
+            Users.payToken(req.user.email);
+            res.status(HttpStatus.OK).json({order_id: order.id, loads: value});
+        });
+    }else if(order.state == Orders.OrderState.IN_ESECUZIONE){
+        Loads.getCompletedOrder(order.id).then((value)=>{
+            let loads : Array<{food: number, requested_q: number, actual_q: number, diff_q: number }>;
+            value.forEach((elem: any)=>{
+                loads.push({
+                    food: elem.food,
+                    requested_q: elem.requested_q,
+                    actual_q: elem.actual_q,
+                    diff_q: (elem.requested_q-elem.actual_q)
+                });
+            });
+            Users.payToken(req.user.email);
+            res.status(HttpStatus.OK).json({order_id: order.id, duration: (order.finish - order.start), loads: loads});
+        });
+    }else{
+        Users.payToken(req.user.email);
+        res.status(HttpStatus.OK).json({order_id: order.id, message: Message.no_loads_msg, loads: null });
+    }
+}
+
+export function getOrderList(req:any, res:any){
+    Loads.getLoadsInPeriod(req.start, req.end).then((value)=>{
+        let retval ={};
+
+        value.forEach((elem: any)=>{
+            const load = {
+                food: elem.food,
+                requested_q: elem.requested_q,
+                actual_q: elem.actual_q,
+                index: elem.index,
+                timestamp: elem.timestamp
+            };
+            if(retval[elem.order].id){
+                retval[elem.order.id].loads.push(load);
+            }else{
+                retval[elem.order.id] = {
+                    state: elem.order.state,
+                    start: elem.order.start,
+                    finish: elem.order.finish,
+                    loads:[load]};
+            }
+        });
+        Users.payToken(req.user.email);
+        res.status(HttpStatus.OK).json({start: req.start, end: req.end, loads: retval});
+    });
+}

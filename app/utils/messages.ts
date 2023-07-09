@@ -19,3 +19,5 @@ export const internal_server_error_message: string = "ERROR - Internal server er
 export const unexisting_food_message: string = "Bad Request - Food not in database"
 export const exceeded_quantity_message: string = "Bad Request - Your request exceeds storage"
 export const already_taken_order_message: string = "Bad Request - Order is already taken or completed"
+
+export const no_loads_msg: string = 'There are no loads associated with this order'
