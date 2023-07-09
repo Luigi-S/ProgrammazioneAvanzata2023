@@ -55,7 +55,9 @@ app.get('/order/list', Middleware.payload, Middleware.validPeriod, function (req
 });
 
 // 7) POST /load/<id_order> -> carico alimento per ordine <id_order> + food_id, quantity
-
+app.post('/load/:id', Middleware.auth, Middleware.addLoad, Middleware.error_handling, function (req: any, res: any) {    
+  OrderController.addLoad(req, res);
+});
 
 
 // 8) POST /admin/token -> re-impostare il numero token di un utente + user_id, token_amount

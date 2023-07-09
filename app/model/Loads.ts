@@ -72,7 +72,8 @@ const Load = sequelize.define(
   export async function getNext(order_id: number) {
     const load = await Load.findOne({
       where: { order: order_id, timestamp: null }, // TODO eventually change to actual_d: null
-      order: ['index', 'ASC'] // findOne restituirà il solo elemento con index più basso, fra quelli selezionati nella where
+      order: ['index', 'ASC'], // findOne restituirà il solo elemento con index più basso, fra quelli selezionati nella where
+      include: Food
     });
     return load;
   }
@@ -101,4 +102,17 @@ const Load = sequelize.define(
       include: Order
     });
     return retval;
+  }
+
+  export async function doLoad(order: number, food: number, quantity: number) {
+    const load= await Load.update(
+      {
+        actual_q: quantity,
+        timestamp: sequelize.fn('NOW')
+      },
+      {
+        where:{order:order, food:food},
+      }
+    );
+    return load;
   }

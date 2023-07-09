@@ -93,3 +93,29 @@ export function getOrderList(req:any, res:any){
         res.status(HttpStatus.OK).json({start: req.start, end: req.end, loads: retval});
     });
 }
+
+export async function failOrder(order_id: number){
+    const order = await Orders.setState(order_id, Orders.OrderState.FALLITO);
+    return order;
+}
+
+export async function completeOrder(order_id: number){
+    const order = await Orders.setState(order_id, Orders.OrderState.COMPLETATO);
+    return order;
+}
+
+async function addLoadAsync(req:any, res:any){
+    const load: any = await Loads.doLoad(req.order.id, req.food.id, req.quantity);
+    await Feed.takeFood(req.quantity, req.food.id);
+    const nxt: any = await Loads.getNext(req.params.id);
+    if(nxt.index === load.index){
+        await completeOrder(req.params.id);
+    }
+}
+
+export function addLoad(req:any, res:any) {
+    addLoadAsync(req, res).then(()=>{
+        Users.payToken(req.user.email);
+        res.status(HttpStatus.OK).json({message: Message.success_load_message});
+    });
+}

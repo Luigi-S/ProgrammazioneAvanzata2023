@@ -46,6 +46,12 @@ export const validPeriod = [
     RequestMiddleware.checkValidPeriod
 ];
 
+export const addLoad = [
+    OrdersMiddleware.checkOrderExists,
+    OrdersMiddleware.checkIfNext,
+    OrdersMiddleware.checkActualQuantity
+]
+
 export const any_other = [
     RequestMiddleware.notFound
 ]

@@ -3,6 +3,7 @@ export const food_created_message: string = "CREATED - Food data successfully cr
 export const order_created_message: string = "CREATED - Order data successfully created";
 export const order_taken_message: string = "SUCCESS - Order successfully taken";
 export const food_updated_message: string = "SUCCESS - Food data successfully updated";
+export const success_load_message: string = "SUCCESS - Load data successfully added";
 
 // ERRORS
 export const not_found_msg: string = "ERROR - Not found";
@@ -16,8 +17,12 @@ export const malformed_payload_message: string = "Bad Request - Malformed payloa
 export const unauthorized_message: string = "ERROR - Unauthorized";
 
 export const internal_server_error_message: string = "ERROR - Internal server error";
-export const unexisting_food_message: string = "Bad Request - Food not in database"
-export const exceeded_quantity_message: string = "Bad Request - Your request exceeds storage"
-export const already_taken_order_message: string = "Bad Request - Order is already taken or completed"
+export const unexisting_food_message: string = "Bad Request - Food not in database";
+export const exceeded_quantity_message: string = "Bad Request - Your request exceeds storage";
+export const already_taken_order_message: string = "Bad Request - Order is already taken or completed";
+
+export const not_next_message: string = "ORDER FAILED - The food loaded is in incorrect order";
+export const unacceptable_q_message: string = "ORDER FAILED - The food loaded is in uncceptable quantity";
+export const not_enough_stored_message: string = "LOAD FAILED - The food loaded is in uncceptable quantity";
 
 export const no_loads_msg: string = 'There are no loads associated with this order'

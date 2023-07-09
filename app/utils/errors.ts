@@ -53,6 +53,13 @@ export function getErrorWithStatus(err: Error): ErrorWithStatus{
         case Message.already_taken_order_message:
             status = HttpStatus.BAD_REQUEST;
             break;
+
+        case Message.not_next_message:
+            status = HttpStatus.BAD_REQUEST; // TODO look per qualcosa di più specifico
+            break;
+        case Message.unacceptable_q_message:
+            status = HttpStatus.BAD_REQUEST; // TODO look per qualcosa di più specifico
+            break;
         default:
             status = HttpStatus.BAD_REQUEST;
     }
