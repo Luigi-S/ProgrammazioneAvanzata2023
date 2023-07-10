@@ -2,8 +2,16 @@ import * as Users from '../model/Users'
 import * as jwt from 'jsonwebtoken';
 import * as Message from '../utils/messages';
 import { UserRole, isRole } from '../model/Users';
+import { public_key } from '../server';
+
 
 require('dotenv').config();
+
+const jwt2 = require('jsonwebtoken');
+
+// client side...
+// const private_key = fs.readFileSync( 'jwtRS256.key');
+//var token=jwt2.sign({"user":"me"},private_key, { algorithm:'RS256'});
 
 const TOKEN_COST: number = 0;
 
@@ -23,7 +31,8 @@ export function checkToken(req: any, res: any, next: any): void{
 
 export function verifyAndAuthenticate(req: any, res: any, next: any): void{
     try {
-        const decoded: string | jwt.JwtPayload  = jwt.verify(req.token, process.env.KEY);
+        const decoded: string | jwt.JwtPayload  = jwt.verify(req.token, public_key, { algorithm:'RS256'});
+        console.log(decoded);
         if (decoded != null) {
             req.body = decoded;
             next();

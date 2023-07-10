@@ -1,6 +1,9 @@
 import * as express from 'express';
 import * as Middleware from './middleware/cor'
 
+import { ErrorWithStatus, getErrorWithStatus } from './utils/errors';
+import * as Message from './utils/messages'
+
 import * as FoodController from './controller/food_controller'
 import * as OrderController from './controller/order_controller'
 import * as AdminController from './controller/admin_controller'
@@ -8,11 +11,13 @@ import * as AdminController from './controller/admin_controller'
 const PORT = 8080;
 const HOST = '0.0.0.0';
 
+const fs = require("fs");
+export const public_key = fs.readFileSync('jwtRS256.key.pub');
+
 const app = express();
 
 app.use(express.json());
 // TODO remove, probabilemnte sovrabbondante, ho fatto già il middleware
-/*
 app.use((err: Error, req: any, res: any, next: any) => {
   if (err instanceof SyntaxError) {
     let new_err: ErrorWithStatus = getErrorWithStatus(Error(Message.malformed_payload_message));
@@ -20,7 +25,6 @@ app.use((err: Error, req: any, res: any, next: any) => {
   }
   next();
 });
-*/
 
 // ROTTE
 // 1) POST /food -> creazione alimento + name, quantity
@@ -49,8 +53,8 @@ app.get('/order/:id', Middleware.auth, Middleware.orderState,Middleware.error_ha
   OrderController.getOrderState(req,res);
 });
 
-// 6) GET /order/list -> <NO-JWT> ottenere lista degli ordini + start, end (query params opzionali)
-app.get('/order/list', Middleware.payload, Middleware.validPeriod, function (req: any, res: any) {
+// 6) GET /list -> <NO-JWT> ottenere lista degli ordini + start, end (query params opzionali)
+app.get('/list', Middleware.validPeriod, function (req: any, res: any) {
   OrderController.getOrderList(req, res);
 });
 
@@ -71,6 +75,7 @@ app.post('/admin/token', Middleware.isAdmin, Middleware.updToken, Middleware.err
  */ 
 app.get('*', Middleware.any_other, Middleware.error_handling);
 app.post('*', Middleware.any_other, Middleware.error_handling);
+app.put('*', Middleware.any_other, Middleware.error_handling);
 
 app.listen(PORT, HOST, err => {
   if (err) return console.log(`Cannot Listen on PORT: ${PORT}`);

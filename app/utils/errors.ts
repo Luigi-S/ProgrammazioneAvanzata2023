@@ -25,20 +25,20 @@ export function getErrorWithStatus(err: Error): ErrorWithStatus{
             status = HttpStatus.BAD_REQUEST; // NON SO SE é GIUSTO    
             break;
         case Message.unauthorized_message:
-            status = HttpStatus.UNAUTH;
+            status = HttpStatus.UNAUTHORIZED;
             break;
 
         case Message.missing_token_message:
-            status = HttpStatus.UNAUTH;
+            status = HttpStatus.UNAUTHORIZED;
             break;
         case Message.invalid_token_message:
-            status = HttpStatus.UNAUTH;
+            status = HttpStatus.UNAUTHORIZED;
             break;
         case Message.no_auth_header_message:
-            status = HttpStatus.UNAUTH;
+            status = HttpStatus.UNAUTHORIZED;
             break;
         case Message.unauthorized_message:
-            status = HttpStatus.UNAUTH;
+            status = HttpStatus.UNAUTHORIZED;
             break;
 
         case Message.internal_server_error_message:
@@ -63,5 +63,9 @@ export function getErrorWithStatus(err: Error): ErrorWithStatus{
         default:
             status = HttpStatus.BAD_REQUEST;
     }
+
+    // TODO DEBUG
+    console.log(`status : ${status}\nmessage: ${err.message}`)
+    if(!status) status = HttpStatus.INTERNAL_SERVER_ERROR;
     return new ErrorWithStatus(status, err);
 }

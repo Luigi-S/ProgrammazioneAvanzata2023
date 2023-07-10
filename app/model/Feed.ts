@@ -5,7 +5,7 @@ import { SingletonDB } from "./sequelize";
 const sequelize = SingletonDB.getInstance().getConnection();
 
 export const Food = sequelize.define(
-  "feed",
+  "foods",
   {
     id: {
       type: DataTypes.INTEGER,
@@ -22,7 +22,7 @@ export const Food = sequelize.define(
     }
   },
   {
-    modelName: "feed",
+    modelName: "foods",
     timestamps: false,
   }
 );

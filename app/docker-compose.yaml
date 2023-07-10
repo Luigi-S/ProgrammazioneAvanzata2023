@@ -10,7 +10,14 @@ services:
           - 5432:5432
         volumes: 
           # copy the sql script to create tables
-          - ./seed/full.sql:/docker-entrypoint-initdb.d/full.sql          
+          - ./seed/full.sql:/docker-entrypoint-initdb.d/full.sql
+    adminer:
+      image: adminer
+      restart: always
+      ports:
+        - 8000:8080
+      depends_on:
+        - dbpg
     web-node:
         build: .
         ports:

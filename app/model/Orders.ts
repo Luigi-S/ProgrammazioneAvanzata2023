@@ -19,7 +19,7 @@ export const Order = sequelize.define(
         autoIncrement: true
       },
       state: {
-        type: DataTypes.ENUM,
+        type: DataTypes.ENUM({values: Object.keys(OrderState)}),
         allowNull: false,
       },
       start: {

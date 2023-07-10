@@ -7,19 +7,17 @@ import { SingletonDB } from "./sequelize";
 const sequelize = SingletonDB.getInstance().getConnection();
 const { Op } = require("sequelize");
 
-export interface LoadSchema{
-  food: number; order: number; quantity: number;
-}
-
 const Load = sequelize.define(
     "loads",
     {
-      food: {
+      foodid: {
         type: DataTypes.INTEGER,
+        primaryKey: true,
         allowNull: false,
       },
-      order: {
+      orderid: {
         type: DataTypes.INTEGER,
+        primaryKey: true,
         allowNull: false,
       },
       index: {
@@ -45,16 +43,20 @@ const Load = sequelize.define(
     }
   );
 
-  Load.belongsTo(Food);
-  Food.hasMany(Load, {
-    foreignKey: 'food'
+  Load.belongsTo(Food, {
+    foreignKey: 'orderid'
   });
-  Load.belongsTo(Order);
+  Food.hasMany(Load, {
+    foreignKey: 'foodid'
+  });
+  Load.belongsTo(Order, {
+    foreignKey: 'orderid'
+  });;
   Order.hasMany(Load, {
-    foreignKey: 'order'
+    foreignKey: 'orderid'
   });
 
-  export async function createLoads(loads: Array<{food: number, order: number, requested_q: number, index: number,}>){
+  export async function createLoads(loads: Array<{foodid: number, orderid: number, requested_q: number, index: number,}>){
     const retval = await Load.bulkCreate(
       loads,
       {validate: true}
@@ -63,31 +65,31 @@ const Load = sequelize.define(
   }
 
   export async function createLoad(food: number, order: number, quantity: number, index: number){
-    const retval = await Load.create({food:food, order:order, requested_q:quantity, index:index});
+    const retval = await Load.create({foodid:food, orderid:order, requested_q:quantity, index:index});
     return retval;
   }
 
   // next
-  // find the lowest INDEX between all the LOADS with ORDER= ORDER_ID and TIMESTAMP=NULL
-  export async function getNext(order_id: number) {
+  // find the lowest INDEX between all the LOADS with ORDER= orderid and TIMESTAMP=NULL
+  export async function getNext(orderid: number) {
     const load = await Load.findOne({
-      where: { order: order_id, timestamp: null }, // TODO eventually change to actual_d: null
+      where: { orderid: orderid, timestamp: null }, // TODO eventually change to actual_d: null
       order: ['index', 'ASC'], // findOne restituirà il solo elemento con index più basso, fra quelli selezionati nella where
       include: Food
     });
     return load;
   }
 
-  export async function getLoadsByOrder(order_id: number) {
+  export async function getLoadsByOrder(orderid: number) {
     const retval = await Load.findAll({
-      where: { order: order_id},
+      where: { orderid: orderid},
     });
     return retval;
   }
 
-  export async function getCompletedOrder(order_id: number) {
+  export async function getCompletedOrder(orderid: number) {
     const retval = await Load.findAll({
-      where: { order: order_id, timestamp: {[Op.ne]:null} },
+      where: { orderid: orderid, timestamp: {[Op.ne]:null} },
     });
     return retval;
   }
@@ -98,7 +100,7 @@ const Load = sequelize.define(
       (start)? { timestamp: {[Op.gt]: start} } : { timestamp: {[Op.lt]: end} }
     const retval = await Load.findAll({
       where: filter,
-      group: 'order',
+      // group: 'orderid',
       include: Order
     });
     return retval;
@@ -111,7 +113,7 @@ const Load = sequelize.define(
         timestamp: sequelize.fn('NOW')
       },
       {
-        where:{order:order, food:food},
+        where:{orderid:order, foodid:food},
       }
     );
     return load;
