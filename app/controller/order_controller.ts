@@ -7,13 +7,10 @@ import * as Message from '../utils/messages'
 var HttpStatus = require('http-status-codes');
 
 export function createOrder(req:any, res:any, next:any){
-    // TODO rotto
     const loads : Array<{food: number, quantity: number}> =  req.body.loads;
     let arr : Array<{foodid: number, orderid: number, requested_q: number, index: number,}>= [];
     
-    console.log('iniziamo');
     Orders.createOrder().then((order:any)=>{
-        console.log(order);
         loads.forEach((value, index) =>{
             arr.push({foodid: value.food, orderid: order.id, requested_q: value.quantity, index:index});
         });
