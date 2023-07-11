@@ -41,10 +41,11 @@ export const Order = sequelize.define(
     const order = await Order.findOne({
       where: { id: id },
     });
-    return order;
+    return (order)? order.dataValues: undefined;
   }
 
   export async function createOrder(){
+    console.log('siamo dentro');
     const retval = await Order.create({state: OrderState.CREATO});
     return retval;
   }

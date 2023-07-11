@@ -18,7 +18,8 @@ export const Food = sequelize.define(
     },
     name: {
       type: DataTypes.STRING,
-      allowNull: false,  
+      unique: true,
+      allowNull: false,
     }
   },
   {
@@ -44,24 +45,25 @@ export async function getFood(id: number) {
   const food = await Food.findOne({
     where: { id: id },
   });
-  return food;
+  return (food)? food.dataValues : undefined;
 }
 
 export async function getFoodByName(name: string) {
     const food = await Food.findOne({
       where: { name: name },
     });
-    return food;
+    return (food)? food.dataValues : undefined;
 }
 
 
 
-export async function updateFood( id: number, quantity?: number, name?: string) {
+export async function updateFood( id: number, quantity: number = undefined, name: string = undefined) {
   let newVal;
-  if(name){
+  if(name && quantity){
+    newVal = {name: name, quantity: quantity};
+  }else if(name){
     newVal = {name: name};
-  }
-  if(quantity){
+  }else if(quantity){
     newVal = {quantity: quantity};
   }
   if(newVal===undefined){

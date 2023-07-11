@@ -10,6 +10,7 @@ export const auth = [
     AuthMiddleware.checkAuthHeader, 
     AuthMiddleware.checkToken, 
     AuthMiddleware.verifyAndAuthenticate,
+    AuthMiddleware.checkOwnerExists,
     AuthMiddleware.checkTokenAmount
 ];
 
@@ -17,6 +18,7 @@ export const isAdmin = [
     AuthMiddleware.checkAuthHeader, 
     AuthMiddleware.checkToken, 
     AuthMiddleware.verifyAndAuthenticate,
+    AuthMiddleware.checkOwnerExists,
     AuthMiddleware.isAdmin
 ];
 
@@ -25,19 +27,16 @@ export const updToken = [
     AdminMiddleware.checkAmountPositive
 ];
 
-export const payload = [
-    RequestMiddleware.checkPayloadHeader,
-    // RequestMiddleware.checkJSONPayload
-];
-
 export const validNewFood = [
     // TODO controllare se UNIQUE di name funziona, in caso contrario, aggiungere middleware per controllo nome originale
+    FeedMiddleware.checkFoodExistsByName,
     FeedMiddleware.checkQuantityPositive
 ];
 
 export const validUpdFood = [
     // TODO controllare se UNIQUE di name funziona, in caso contrario, aggiungere middleware per controllo nome originale
     FeedMiddleware.checkFoodExists,
+    FeedMiddleware.checkFoodExistsByName,
     FeedMiddleware.checkQuantityPositive
 ];
 

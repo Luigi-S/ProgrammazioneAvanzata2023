@@ -22,14 +22,12 @@ export function checkValidOrder(req: any, res: any, next: any): void{
                 }else{
                     next(Error(Message.unexisting_food_message));
                 }
-            });
-            // TODO aggiungere .catch()?
+            }).catch((err)=>{next(err);});
         }else{
             // q<0
             next(Error(Message.bad_request_msg));
         }
     });
-    next();
 }
 
 export function checkOrderExists(req: any, res: any, next: any): void{

@@ -50,4 +50,5 @@ REFERENCES orders(id);
 -- inserimento di 2 utenti
 INSERT INTO users(email, role, token) VALUES
 ('user@user.com', 1, 15),
+('no@tokens.com', 1, 0),
 ('admin@admin.com', 0, 100);

@@ -6,46 +6,51 @@ import * as Message from '../utils/messages'
 
 var HttpStatus = require('http-status-codes');
 
-export function createOrder(req:any, res:any){
+export function createOrder(req:any, res:any, next:any){
+    // TODO rotto
     const loads : Array<{food: number, quantity: number}> =  req.body.loads;
     let arr : Array<{foodid: number, orderid: number, requested_q: number, index: number,}>= [];
     
-    
+    console.log('iniziamo');
     Orders.createOrder().then((order:any)=>{
+        console.log(order);
         loads.forEach((value, index) =>{
             arr.push({foodid: value.food, orderid: order.id, requested_q: value.quantity, index:index});
         });
         Loads.createLoads(arr).then((loads) => {
             Users.payToken(req.body.user.email);
             res.status(HttpStatus.CREATED).json({message: Message.order_created_message, orderid: order, loads: loads});
+            next();
         }).catch((err) => {
             Orders.destroyOrder(order.id).then((value)=>{
-                throw Error(Message.internal_server_error_message)
+                next(Error(Message.internal_server_error_message));
             }).catch((err)=> {
                 console.log(err.message);
-                throw Error(Message.internal_server_error_message)
+                next(Error(Message.internal_server_error_message));
             });
         });
     }).catch((err) => {
         console.log(err.message);
-        throw Error(Message.internal_server_error_message)
+        next(Error(Message.internal_server_error_message));
     });
     
 }
 
-export function takeOrder(req:any, res:any){
+export function takeOrder(req:any, res:any, next:any){
     Orders.setState(req.params.id, Orders.OrderState.IN_ESECUZIONE).then((value)=>{
         Users.payToken(req.body.user.email);
         res.status(HttpStatus.OK).json({message: Message.order_taken_message, order: value});
+        next();
     });
 }
 
-export function getOrderState(req:any, res:any){
+export function getOrderState(req:any, res:any, next:any){
     const order: any = req.body.order;
     if(order.state == Orders.OrderState.COMPLETATO){
         Loads.getLoadsByOrder(order.id).then((value)=>{
             Users.payToken(req.body.user.email);
             res.status(HttpStatus.OK).json({orderid: order.id, loads: value});
+            next();
         });
     }else if(order.state == Orders.OrderState.IN_ESECUZIONE){
         Loads.getCompletedOrder(order.id).then((value)=>{
@@ -60,14 +65,16 @@ export function getOrderState(req:any, res:any){
             });
             Users.payToken(req.body.user.email);
             res.status(HttpStatus.OK).json({orderid: order.id, duration: (order.finish - order.start), loads: loads});
+            next();
         });
     }else{
         Users.payToken(req.body.user.email);
         res.status(HttpStatus.OK).json({orderid: order.id, message: Message.no_loads_msg, loads: null });
+        next();
     }
 }
 
-export function getOrderList(req:any, res:any){
+export function getOrderList(req:any, res:any, next:any){
     Loads.getLoadsInPeriod(req.query.start, req.query.end).then((value)=>{
         let retval ={};
 
@@ -92,6 +99,7 @@ export function getOrderList(req:any, res:any){
         });
         console.log(retval);
         res.status(HttpStatus.OK).json({start: req.query.start, end: req.query.end, loads: retval});
+        next();
     });
 }
 
@@ -115,9 +123,10 @@ async function addLoadAsync(req:any, res:any){
     }
 }
 
-export function addLoad(req:any, res:any) {
+export function addLoad(req:any, res:any, next:any){
     addLoadAsync(req, res).then(()=>{
         Users.payToken(req.body.user.email);
         res.status(HttpStatus.OK).json({message: Message.success_load_message});
-    });
+        next();
+    }).catch((err)=>{next(err);});
 }

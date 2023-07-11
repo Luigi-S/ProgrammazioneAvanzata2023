@@ -16,9 +16,21 @@ export function checkQuantityPositive (req: any, res: any, next: any): void{
 export function checkFoodExists (req: any, res: any, next: any): void{
     FoodController.checkFoodExists(req.params.id).then((value)=>{
         if(value){
-            next(); // TODO aggiungere value a req?
+            next();
         }else{
             next(Error(Message.unexisting_food_message));
+        }
+    }).catch((error) => { 
+        next(Error(Message.malformed_payload_message));
+    });
+}
+
+export function checkFoodExistsByName (req: any, res: any, next: any): void{
+    FoodController.checkFoodExistsByName(req.body.name).then((value)=>{
+        if(!value){
+            next();
+        }else{
+            next(Error(Message.already_existing_food_message));
         }
     }).catch((error) => { 
         next(Error(Message.malformed_payload_message));

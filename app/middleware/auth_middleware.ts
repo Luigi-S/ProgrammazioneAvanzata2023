@@ -1,17 +1,11 @@
-import * as Users from '../model/Users'
+import * as Users from '../model/Users';
 import * as jwt from 'jsonwebtoken';
 import * as Message from '../utils/messages';
-import { UserRole, isRole } from '../model/Users';
+import { UserRole } from '../model/Users';
 import { public_key } from '../server';
 
 
 require('dotenv').config();
-
-const jwt2 = require('jsonwebtoken');
-
-// client side...
-// const private_key = fs.readFileSync( 'jwtRS256.key');
-//var token=jwt2.sign({"user":"me"},private_key, { algorithm:'RS256'});
 
 const TOKEN_COST: number = 0;
 
@@ -32,7 +26,6 @@ export function checkToken(req: any, res: any, next: any): void{
 export function verifyAndAuthenticate(req: any, res: any, next: any): void{
     try {
         const decoded: string | jwt.JwtPayload  = jwt.verify(req.token, public_key, { algorithm:'RS256'});
-        console.log(decoded);
         if (decoded != null) {
             req.body = decoded;
             next();
@@ -44,19 +37,31 @@ export function verifyAndAuthenticate(req: any, res: any, next: any): void{
 
 // usare dopo la chain del jwt, per operazioni admin
 export function isAdmin(req: any, res: any, next: any): void{
-    if (isRole(UserRole.Admin, req.body.user.email)) {
+    if (UserRole.Admin === req.body.user.role) {
         next();
-      } else {
+    } else {
         next(Error(Message.unauthorized_message));
-      }
+    }
 }
 
-export function checkTokenAmount(req: any, res: any, next: any): void{
-    Users.getTokenNumber(req.body.user.email).then((user:any)=>{
-        if(user.token>TOKEN_COST){
+export function checkOwnerExists(req: any, res: any, next: any): void{
+    Users.getUser(req.body.user).then((value)=>{
+        if(value){
+            req.body.user = value,
             next();
-        }else{
-            next(Error(Message.unauthorized_message));
+        }else {
+            next(Error(Message.bad_request_msg));
         }
+    }).catch((err)=>{
+        next(Error(Message.bad_request_msg));
     });
+}
+
+
+export function checkTokenAmount(req: any, res: any, next: any): void{
+    if(req.body.user.token>TOKEN_COST){
+        next();
+    }else{
+        next(Error(Message.unauthorized_message));
+    }
 }
