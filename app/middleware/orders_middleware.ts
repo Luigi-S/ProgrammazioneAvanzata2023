@@ -3,6 +3,7 @@ import * as Orders from '../model/Orders'
 import * as Loads from '../model/Loads'
 import * as Message from '../utils/messages'
 import * as OrderController from '../controller/order_controller'
+import { error } from 'console'
 
 const DATE_FORMATS = ['DD-MM-YYYY', 'DD/MM/YYYY'];
 
@@ -92,20 +93,31 @@ export function checkValidPeriod(req: any, res: any, next: any): void{
     const moment = require('moment');
     const start: string = req.query.start;
     const end: string = req.query.end;
+    console.log(req.query.start);
+    console.log(req.query.end);
     if((moment(start, DATE_FORMATS, true).isValid() || !start) &&
         (moment(end, DATE_FORMATS, true).isValid() || !end)){
-            try{
-                const start_arr = start? start.split(/[-/]/).map((val:string)=>parseInt(val)): undefined;
-                const end_arr = end? end.split(/[-/]/).map((val:string)=>parseInt(val)): undefined;
+            if(start || end){
+                try{
+                    const start_arr = start? start.split(/[-/]/).map((val:string)=>parseInt(val)): undefined;
+                    const end_arr = end? end.split(/[-/]/).map((val:string)=>parseInt(val)): undefined;
 
-                req.query.start = new Date(start_arr[2],start_arr[1], start_arr[0]);
-                req.query.end = new Date(end_arr[2], end_arr[1], end_arr[0]);
-            
-                if(start && end && req.query.end<=req.query.start){
+                    console.log(start_arr);
+                    console.log(end_arr);
+
+                    req.query.start = start_arr? new Date(start_arr[2],start_arr[1], start_arr[0]) : undefined;
+                    req.query.end = end_arr? new Date(end_arr[2], end_arr[1], end_arr[0]) : undefined;
+                
+                    console.log(req.query.start);
+                    console.log(req.query.end);
+                    if(req.query.start && req.query.end && req.query.end<=req.query.start){
+                        next(Error(Message.bad_request_msg));
+                    }
+                }catch(err){
+                    console.log(err);
+                
                     next(Error(Message.bad_request_msg));
                 }
-            }catch{
-                next(Error(Message.bad_request_msg));
             }
             next();
     }else{

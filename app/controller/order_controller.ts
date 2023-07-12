@@ -45,7 +45,7 @@ export function getOrderState(req:any, res:any, next:any){
         });
     }else if(order.state == Orders.OrderState.IN_ESECUZIONE){
         Loads.getCompletedOrder(order.id).then((value)=>{
-            let loads : Array<{food: number, requested_q: number, actual_q: number, diff_q: number }>;
+            let loads : Array<{food: number, requested_q: number, actual_q: number, diff_q: number }> =[];
             value.forEach((elem: any)=>{
                 loads.push({
                     food: elem.food,
@@ -91,7 +91,11 @@ export function getOrderList(req:any, res:any, next:any){
         console.log(retval);
         res.status(HttpStatus.OK).json({start: req.query.start, end: req.query.end, loads: retval});
         next();
-    }).catch((err)=>{next(Error(Message.internal_server_error_message))}); // TODO implementare caso di data malformed
+    }).catch((err)=>{
+        console.log('--------!-----------')
+        console.log(err);
+        next(Error(Message.internal_server_error_message))
+    }); // TODO implementare caso di data malformed
 }
 
 export async function failOrder(orderid: number){
