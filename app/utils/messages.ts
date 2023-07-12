@@ -24,7 +24,11 @@ export const already_taken_order_message: string = "Bad Request - Order is alrea
 
 export const not_next_message: string = "ORDER FAILED - The food loaded is in incorrect order";
 export const unacceptable_q_message: string = "ORDER FAILED - The food loaded is in uncceptable quantity";
-export const not_enough_stored_message: string = "LOAD FAILED - The food loaded is in uncceptable quantity";
+export const not_enough_stored_message: string = "ORDER FAILED - The food loaded is in uncceptable quantity";
 export const already_existing_food_message: string = "Bad Request - Name selected for this food is already taken";
+
+export const not_executing_order_message: string = "LOAD FAILED - The order selected is not in execution, cannot load food";
+export const repeated_food_message: string = "Bad request - Your order has repeated food(s), not allowed";
+
 
 export const no_loads_msg: string = 'There are no loads associated with this order'

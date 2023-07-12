@@ -88,12 +88,9 @@ export function getOrderList(req:any, res:any, next:any){
                     loads:[load]};
             }
         });
-        console.log(retval);
         res.status(HttpStatus.OK).json({start: req.query.start, end: req.query.end, loads: retval});
         next();
     }).catch((err)=>{
-        console.log('--------!-----------')
-        console.log(err);
         next(Error(Message.internal_server_error_message))
     }); // TODO implementare caso di data malformed
 }
@@ -113,7 +110,8 @@ async function addLoadAsync(req:any, res:any){
     const load: any = await Loads.doLoad(body.order.id, body.food.id, body.quantity);
     await Feed.takeFood(body.quantity, body.food.id);
     const nxt: any = await Loads.getNext(req.params.id);
-    if(nxt.index === load.index){
+    if(!nxt){
+        // IF nxt == undefined, ho consluso l'ordine.
         await completeOrder(req.params.id);
     }
 }

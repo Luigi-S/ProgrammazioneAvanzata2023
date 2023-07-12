@@ -3,7 +3,6 @@ import * as Orders from '../model/Orders'
 import * as Loads from '../model/Loads'
 import * as Message from '../utils/messages'
 import * as OrderController from '../controller/order_controller'
-import { error } from 'console'
 
 const DATE_FORMATS = ['DD-MM-YYYY', 'DD/MM/YYYY'];
 
@@ -12,7 +11,14 @@ export function checkValidOrder(req: any, res: any, next: any): void{
     if(!loads.length){
         next(Error(Message.bad_request_msg));
     }
-
+    let keys = new Set<number>();
+    loads.forEach((elem)=>{
+        keys.add(elem.food);
+    });
+    if(keys.size < loads.length){
+        next(Error(Message.repeated_food_message));
+    }
+    
     loads.forEach((elem)=>{
         if(elem.quantity > 0){
             Feed.getFood(elem.food).then((value:any)=>{
@@ -42,7 +48,15 @@ export function checkOrderExists(req: any, res: any, next: any): void{
             // order does not exist
             next(Error(Message.bad_request_msg));
         }
-    });
+    }).catch(()=>{next(Error(Message.bad_request_msg));});
+}
+
+export function checkInExecution(req: any, res: any, next: any): void{
+    if(req.body.order.state !== Orders.OrderState.IN_ESECUZIONE){
+        next(Error(Message.not_executing_order_message));
+    }else{
+        next();
+    }
 }
 
 export function checkOrderNotStarted(req: any, res: any, next: any): void{
@@ -54,13 +68,30 @@ export function checkOrderNotStarted(req: any, res: any, next: any): void{
     }
 }
 
-export function checkIfNext(req: any, res: any, next: any): void{
-    Loads.getNext(req.params.id).then((value:any)=>{
-        if(value.food.id === req.body.food){
-            req.body.food = value.food;
+export function checkFoodIdExists(req:any, res:any, next:any){
+    Feed.getFood(req.params.food).then((value)=>{
+        if(value){
             next();
         }else{
-            OrderController.failOrder(value.order);
+            next(Error(Message.unexisting_food_message));
+        }
+    }).catch(()=>{
+        next(Error(Message.bad_request_msg));
+    });
+}
+
+export function checkIfNext(req: any, res: any, next: any): void{
+    
+    Loads.getNext(req.params.id).then((value:any)=>{
+        if(!value){
+            next(Error(Message.not_next_message));
+        }
+        if(value.foodid === req.body.food){
+            req.body.requested_q = value.requested_q;
+            req.body.food = value.food.dataValues;
+            next();
+        }else{
+            OrderController.failOrder(value.orderid);
             next(Error(Message.not_next_message));
         }
     });
@@ -68,14 +99,15 @@ export function checkIfNext(req: any, res: any, next: any): void{
 
 export function checkActualQuantity(req: any, res: any, next: any): void{ 
     require('dotenv').config();
-    req =req.body;
-    const N: number = parseInt(process.env.N as string)/100;
-    const min_accepted = req.food.requested_q*(1-N);
-    const max_accepted = req.food.requested_q*(1+N);
-    if(req.quantity>min_accepted && req.quantity<max_accepted){
+    const N: number = parseFloat(process.env.N as string)/100;
+    const min_accepted = req.body.requested_q*(1-N);
+    const max_accepted = req.body.requested_q*(1+N);
+    console.log(min_accepted);
+    console.log(max_accepted);
+    if(req.body.quantity>=min_accepted && req.body.quantity<=max_accepted){
         next();
     }else{
-        OrderController.failOrder(req.order.id);
+        OrderController.failOrder(req.params.id);
         next(Error(Message.unacceptable_q_message));
     }
 }
@@ -84,7 +116,7 @@ export function checkStoredQuantity(req: any, res: any, next: any): void{
     if(req.body.quantity<=req.body.food.quantity){
         next();
     }else{
-        // TODO anche in questo caso è FALLITO?
+        OrderController.failOrder(req.params.id);
         next(Error(Message.not_enough_stored_message));
     }
 }

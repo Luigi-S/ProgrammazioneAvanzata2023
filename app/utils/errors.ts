@@ -44,6 +44,9 @@ export function getErrorWithStatus(err: Error): ErrorWithStatus{
         case Message.internal_server_error_message:
             status = HttpStatus.INTERNAL_SERVER_ERROR;
             break;
+        case Message.not_executing_order_message:
+            status = HttpStatus.INTERNAL_SERVER_ERROR;
+            break;
         case Message.unexisting_food_message:
             status = HttpStatus.BAD_REQUEST;
             break;
@@ -59,6 +62,9 @@ export function getErrorWithStatus(err: Error): ErrorWithStatus{
             break;
         case Message.unacceptable_q_message:
             status = HttpStatus.BAD_REQUEST; // TODO look per qualcosa di più specifico
+            break;
+        case Message.repeated_food_message:
+            status = HttpStatus.BAD_REQUEST;
             break;
         default:
             status = HttpStatus.BAD_REQUEST;

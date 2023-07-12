@@ -44,7 +44,7 @@ const Load = sequelize.define(
   );
 
   Load.belongsTo(Food, {
-    foreignKey: 'orderid'
+    foreignKey: 'foodid'
   });
   Food.hasMany(Load, {
     foreignKey: 'foodid'
@@ -75,9 +75,11 @@ const Load = sequelize.define(
   export async function getNext(orderid: number) {
     const load = await Load.findOne({
       where: { orderid: orderid, timestamp: null }, // TODO eventually change to actual_d: null
-      order: ['index', 'ASC'], // findOne restituirà il solo elemento con index più basso, fra quelli selezionati nella where
+      order: [['index', 'ASC']], // findOne restituirà il solo elemento con index più basso, fra quelli selezionati nella where
       include: Food
     });
+    console.log('NEXT');
+    console.log( load? load.dataValues : undefined);
     return load? load.dataValues : undefined;
   }
 
@@ -85,6 +87,7 @@ const Load = sequelize.define(
     const retval:any = await Load.findAll({
       where: { orderid: orderid},
     });
+
     return retval;
   }
 
