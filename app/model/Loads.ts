@@ -33,7 +33,7 @@ const Load = sequelize.define(
         allowNull: true,
       },
       timestamp: {
-        type: DataTypes.TIME,
+        type: DataTypes.DATEONLY,
         allowNull: true,  
       }
     },
@@ -78,30 +78,41 @@ const Load = sequelize.define(
       order: ['index', 'ASC'], // findOne restituirà il solo elemento con index più basso, fra quelli selezionati nella where
       include: Food
     });
-    return load;
+    return load? load.dataValues : undefined;
   }
 
   export async function getLoadsByOrder(orderid: number) {
-    const retval = await Load.findAll({
+    const retval:any = await Load.findAll({
       where: { orderid: orderid},
     });
     return retval;
   }
 
   export async function getCompletedOrder(orderid: number) {
-    const retval = await Load.findAll({
+    const retval:any = await Load.findAll({
       where: { orderid: orderid, timestamp: {[Op.ne]:null} },
     });
     return retval;
   }
 
   export async function getLoadsInPeriod(start?: Date, end?: Date) {
-    const filter = (start&&end)? { timestamp: {[Op.between]:[start,end]} } :
-      (!start && !end)? { } : 
-      (start)? { timestamp: {[Op.gt]: start} } : { timestamp: {[Op.lt]: end} }
-    const retval = await Load.findAll({
-      where: filter,
-      // group: 'orderid',
+    
+    const filter = (start&&end)? {
+      timestamp: {[Op.between]:[
+        start,
+        end,
+      ]}
+    } : (!start && !end)? { } : 
+        (start)? {
+          timestamp: {[Op.gt]: start}
+        } : { timestamp: {[Op.lt]: end} }
+    const retval :any = await Load.findAll({
+      where: {
+        [Op.and]:[
+          {timestamp: {[Op.not]: null}},
+          filter
+        ]
+      },
       include: Order
     });
     return retval;

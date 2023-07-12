@@ -22,8 +22,8 @@ CREATE TYPE order_state AS ENUM ('CREATO', 'IN ESECUZIONE', 'FALLITO', 'COMPLETA
 CREATE TABLE orders(
   id SERIAL PRIMARY KEY,
   state order_state NOT NULL,
-  start TIMESTAMP,
-  finish TIMESTAMP
+  start DATE,
+  finish DATE
 );
 
 CREATE TABLE loads(
@@ -33,7 +33,7 @@ CREATE TABLE loads(
   index INTEGER NOT NULL,
   requested_q REAL NOT NULL,
   actual_q REAL,
-  timestamp TIMESTAMP
+  timestamp DATE
 );
 
 ALTER TABLE loads

@@ -90,14 +90,24 @@ export function checkStoredQuantity(req: any, res: any, next: any): void{
 
 export function checkValidPeriod(req: any, res: any, next: any): void{ 
     const moment = require('moment');
-    const start: string = req.start;
-    const end: string = req.end;
+    const start: string = req.query.start;
+    const end: string = req.query.end;
     if((moment(start, DATE_FORMATS, true).isValid() || !start) &&
         (moment(end, DATE_FORMATS, true).isValid() || !end)){
-        if(start && end && Date.parse(end)<=Date.parse(start)){
-            next(Error(Message.bad_request_msg));    
-        }
-        next();
+            try{
+                const start_arr = start? start.split(/[-/]/).map((val:string)=>parseInt(val)): undefined;
+                const end_arr = end? end.split(/[-/]/).map((val:string)=>parseInt(val)): undefined;
+
+                req.query.start = new Date(start_arr[2],start_arr[1], start_arr[0]);
+                req.query.end = new Date(end_arr[2], end_arr[1], end_arr[0]);
+            
+                if(start && end && req.query.end<=req.query.start){
+                    next(Error(Message.bad_request_msg));
+                }
+            }catch{
+                next(Error(Message.bad_request_msg));
+            }
+            next();
     }else{
         next(Error(Message.bad_request_msg));
     }

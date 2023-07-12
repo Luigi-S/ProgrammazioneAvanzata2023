@@ -69,19 +69,19 @@ export function getOrderList(req:any, res:any, next:any){
     Loads.getLoadsInPeriod(req.query.start, req.query.end).then((value)=>{
         let retval ={};
 
-        value.forEach((elem: any)=>{
-            console.log(elem);
+        value.forEach((loads: any)=>{
+            const elem = loads.dataValues;
             const load = {
-                food: elem.food,
+                food: elem.foodid,
                 requested_q: elem.requested_q,
                 actual_q: elem.actual_q,
                 index: elem.index,
                 timestamp: elem.timestamp
             };
-            if(retval[elem.order].id){
-                retval[elem.order.id].loads.push(load);
+            if(retval[elem.orderid]){
+                retval[elem.orderid].loads.push(load);
             }else{
-                retval[elem.order.id] = {
+                retval[elem.orderid] = {
                     state: elem.order.state,
                     start: elem.order.start,
                     finish: elem.order.finish,
@@ -91,7 +91,7 @@ export function getOrderList(req:any, res:any, next:any){
         console.log(retval);
         res.status(HttpStatus.OK).json({start: req.query.start, end: req.query.end, loads: retval});
         next();
-    });
+    }).catch((err)=>{next(Error(Message.internal_server_error_message))}); // TODO implementare caso di data malformed
 }
 
 export async function failOrder(orderid: number){
