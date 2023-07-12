@@ -45,7 +45,6 @@ export const Order = sequelize.define(
   }
 
   export async function createOrder(){
-    console.log('siamo dentro');
     const retval = await Order.create({state: OrderState.CREATO});
     return retval;
   }

@@ -44,11 +44,17 @@ REFERENCES foods(id);
 ALTER TABLE loads
 ADD CONSTRAINT fk_order
 FOREIGN KEY(orderId) 
-REFERENCES orders(id);
+REFERENCES orders(id)
+ ON DELETE CASCADE;
 
 
--- inserimento di 2 utenti
 INSERT INTO users(email, role, token) VALUES
 ('user@user.com', 1, 15),
 ('no@tokens.com', 1, 0),
 ('admin@admin.com', 0, 100);
+
+INSERT INTO foods(name, quantity) VALUES
+('uova', 20),
+('riso', 20),
+('orzo', 20);
+

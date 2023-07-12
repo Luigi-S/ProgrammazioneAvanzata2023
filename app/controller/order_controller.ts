@@ -9,7 +9,7 @@ var HttpStatus = require('http-status-codes');
 export function createOrder(req:any, res:any, next:any){
     const loads : Array<{food: number, quantity: number}> =  req.body.loads;
     let arr : Array<{foodid: number, orderid: number, requested_q: number, index: number,}>= [];
-    
+
     Orders.createOrder().then((order:any)=>{
         loads.forEach((value, index) =>{
             arr.push({foodid: value.food, orderid: order.id, requested_q: value.quantity, index:index});
@@ -21,14 +21,8 @@ export function createOrder(req:any, res:any, next:any){
         }).catch((err) => {
             Orders.destroyOrder(order.id).then((value)=>{
                 next(Error(Message.internal_server_error_message));
-            }).catch((err)=> {
-                console.log(err.message);
-                next(Error(Message.internal_server_error_message));
             });
         });
-    }).catch((err) => {
-        console.log(err.message);
-        next(Error(Message.internal_server_error_message));
     });
     
 }

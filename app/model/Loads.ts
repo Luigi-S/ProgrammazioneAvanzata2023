@@ -51,9 +51,10 @@ const Load = sequelize.define(
   });
   Load.belongsTo(Order, {
     foreignKey: 'orderid'
-  });;
+  });
   Order.hasMany(Load, {
-    foreignKey: 'orderid'
+    foreignKey: 'orderid',
+    onDelete: 'CASCADE',
   });
 
   export async function createLoads(loads: Array<{foodid: number, orderid: number, requested_q: number, index: number,}>){

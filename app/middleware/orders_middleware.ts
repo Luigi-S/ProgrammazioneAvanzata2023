@@ -15,6 +15,7 @@ export function checkValidOrder(req: any, res: any, next: any): void{
     loads.forEach((elem)=>{
         if(elem.quantity > 0){
             Feed.getFood(elem.food).then((value:any)=>{
+                console.log(value);
                 if(value){
                     if(value.quantity < elem.quantity){
                         next(Error(Message.exceeded_quantity_message));    
