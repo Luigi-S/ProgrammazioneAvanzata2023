@@ -27,7 +27,7 @@ app.put('/food/:id', Middleware.auth, Middleware.validUpdFood, function (req: an
 });
 
 // 3) POST /order -> creazione ordine + loads:[ food, quantity]
-// TODO probabilmente singola rotta più complessa(?)
+// Il client otterrà così l'id generato per l'ordine, impiegabile in altri metodi
 app.post('/order', Middleware.auth, Middleware.validOrder,  function (req: any, res: any, next:any) {    
   OrderController.createOrder(req, res, next);
 });
@@ -39,7 +39,7 @@ app.post('/order/:id', Middleware.auth, Middleware.takeOrder, function (req: any
 
 // 5) GET /order/<id_order> -> dati ordine <id_order>
 app.get('/order/:id', Middleware.auth, Middleware.orderState, function (req: any, res: any, next:any) {
-  OrderController.getOrderState(req,res, next);
+  OrderController.getOrderData(req,res, next);
 });
 
 // 6) GET /list -> <NO-JWT> ottenere lista degli ordini + start, end (query params opzionali)
@@ -57,10 +57,9 @@ app.post('/admin/token', Middleware.isAdmin, Middleware.updToken, function (req:
   AdminController.updateToken(req, res, next);
 });
 
-// TODO remove, probabilemnte sovrabbondante, ho fatto già il middleware
+
+// middleware per ERROR HANDLING
 app.use(Middleware.error_handling);
-
-
 
 /** 
  * Gestione delle rotte non previste

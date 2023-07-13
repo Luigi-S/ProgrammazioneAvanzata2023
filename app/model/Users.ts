@@ -3,11 +3,16 @@ import { Model, DataTypes } from "sequelize";
 import { SingletonDB } from "./sequelize";
 const sequelize = SingletonDB.getInstance().getConnection();
 
+// costo di default di una qualsiasi operazione autorizzata tramite JWT
+export const TOKEN_COST: number = 1;
+
+// enum dei ruoli possibili degli user
 export enum UserRole {
     Admin =0,
     Generic =1,
 }
 
+// User model schema
 export class User extends Model{
   public email!: string;
   public token!: number;
@@ -38,7 +43,12 @@ User.init(
   }
 );
 
-
+/**
+ * 
+ * @param email 
+ * 
+ * Restituisce il numero di "token" dell'utente identificato da "email"
+ */
 export async function getTokenNumber(email: string) {
   const budget = await User.findOne({
     attributes: ["token"],
@@ -47,6 +57,12 @@ export async function getTokenNumber(email: string) {
   return budget;
 }
 
+/**
+ * 
+ * @param email 
+ * 
+ * Funzione che restituisce, se esistente, l'utente associato alla "email" indicata
+ */
 export async function getUser(email: string) {
   const user = await User.findOne({
     where: { email: email },
@@ -54,13 +70,13 @@ export async function getUser(email: string) {
   return (user)? user.dataValues : undefined;
 }
 
-/*
-export async function isRole(role: number, email: string) {
-    const user: any = await getUser(email);
-    return (user)? (user.role === role) : false;
-}
-*/
-
+/**
+ * 
+ * @param newTokenNumber 
+ * @param email 
+ * 
+ * Funzione che aggiorna il valore di "token" a "newTokenNumber" per lo user di id: "email"
+ */
 export async function updateToken(newTokenNumber: number, email: string) {
   await User.update(
     {
@@ -72,7 +88,14 @@ export async function updateToken(newTokenNumber: number, email: string) {
   );
 }
 
-export function payToken(email: string, amount: number=1): void{
+/**
+ * 
+ * @param email 
+ * @param amount
+ * 
+ * Funzione che sottrae al totale "token" dello user identiificato da "email", il valore "amount", che di default vale TOKEN_COST
+ */
+export function payToken(email: string, amount: number=TOKEN_COST): void{
   User.decrement(['token'], {by: amount, where: { email: email } }
     ).then(()=>{
       return;

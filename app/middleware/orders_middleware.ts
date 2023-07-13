@@ -5,7 +5,15 @@ import * as Message from '../utils/messages'
 import * as OrderController from '../controller/order_controller'
 
 const DATE_FORMATS = ['DD-MM-YYYY', 'DD/MM/YYYY'];
-
+/**
+ * Validazione ordine: req.body ha un array "loads", ogni elemento di tale array è così composto:
+ * "food" : id dell'alimento, "quantity" : quantità da caricare
+ * 
+ * Errori:
+ * Malformed request, quantità negativa o nulla, array vuoto -> bad request
+ * "requested_quantity" superiore a dispponibilità di food("quantity") -> exceeded quantity
+ * Alimento non esistente -> unexisting food
+ */
 export function checkValidOrder(req: any, res: any, next: any): void{
     const loads : Array<{food: number, quantity: number}> =  req.body.loads;
     if(!loads.length){
@@ -39,13 +47,16 @@ export function checkValidOrder(req: any, res: any, next: any): void{
     next();
 }
 
+
+/**
+ * Controllo che l'ordine indicato da parametro "id" esista, altrimenti -> bad request 
+ */
 export function checkOrderExists(req: any, res: any, next: any): void{
     Orders.getOrder(req.params.id).then((value)=>{
         if(value){
             req.body.order = value;
             next();
         }else{
-            // order does not exist
             next( Message.bad_request_msg);
         }
     }).catch((err)=>{
@@ -53,6 +64,10 @@ export function checkOrderExists(req: any, res: any, next: any): void{
         next( Message.bad_request_msg);});
 }
 
+
+/**
+ * Controllo che l'ordine indicato da parametro "id" abbia "state" pari ad IN_ESECUZIONE, altrimenti -> not executing 
+ */
 export function checkInExecution(req: any, res: any, next: any): void{
     if(req.body.order.state !== Orders.OrderState.IN_ESECUZIONE){
         next( Message.not_executing_order_message);
@@ -61,6 +76,10 @@ export function checkInExecution(req: any, res: any, next: any): void{
     }
 }
 
+
+/**
+ * Controllo che l'ordine indicato da parametro "id" abbia stato "CREATO", altrimenti -> already taken
+ */
 export function checkOrderNotStarted(req: any, res: any, next: any): void{
     if(req.body.order.state==Orders.OrderState.CREATO){
         next();
@@ -70,8 +89,11 @@ export function checkOrderNotStarted(req: any, res: any, next: any): void{
     }
 }
 
+/**
+ * Controllo che l'alimento indicato da parametro "food" esista, altrimenti -> unexisting food 
+ */
 export function checkFoodIdExists(req:any, res:any, next:any){
-    Feed.getFood(req.params.food).then((value)=>{
+    Feed.getFood(req.body.food).then((value)=>{
         if(value){
             next();
         }else{
@@ -84,6 +106,9 @@ export function checkFoodIdExists(req:any, res:any, next:any){
     });
 }
 
+/**
+ * Controllo che l'alimento indicato da parametro "food" sia effettivamente il prossimo della sequenza di carichi dell'ordine "id", altrimenti -> not next
+ */
 export function checkIfNext(req: any, res: any, next: any): void{
     
     Loads.getNext(req.params.id).then((value)=>{
@@ -101,13 +126,16 @@ export function checkIfNext(req: any, res: any, next: any): void{
     });
 }
 
+
+/**
+ * Verifica che la quantità "quantity" effettivamente caricata si trovi in un range del N% (paramentro salvato in dotenv)
+ * del valore "requested_q" per lo stesso alimento nell'ordine, altrimenti -> unacceptable q
+ */
 export function checkActualQuantity(req: any, res: any, next: any): void{ 
     require('dotenv').config();
     const N: number = parseFloat(process.env.N as string)/100;
     const min_accepted = req.body.requested_q*(1-N);
     const max_accepted = req.body.requested_q*(1+N);
-    console.log(min_accepted);
-    console.log(max_accepted);
     if(req.body.quantity>=min_accepted && req.body.quantity<=max_accepted){
         next();
     }else{
@@ -116,6 +144,10 @@ export function checkActualQuantity(req: any, res: any, next: any): void{
     }
 }
 
+/**
+ * Verifica che la quantità "quantity" effettivamente caricata sia inferiore o uguale a quella complessiva dell'alimento
+ * Se non è così, l'ordine fallisce
+ */
 export function checkStoredQuantity(req: any, res: any, next: any): void{ 
     if(req.body.quantity<=req.body.food.quantity){
         next();
@@ -125,6 +157,10 @@ export function checkStoredQuantity(req: any, res: any, next: any): void{
     }
 }
 
+/**
+* Verifica che le date "start" ed "end", se presenti, sono correttamente formattate, nei formati espressi in DATEFORMATS,
+* Inoltre, se entrambi presenti, che la fine sia successiva all'inizio del periodo
+*/
 export function checkValidPeriod(req: any, res: any, next: any): void{ 
     const moment = require('moment');
     const start: string = req.query.start;

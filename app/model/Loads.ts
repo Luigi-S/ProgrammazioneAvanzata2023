@@ -83,19 +83,25 @@ export default Load;
     return retval;
   }
 
-  // next
-  // find the lowest INDEX between all the LOADS with ORDER= orderid and TIMESTAMP=NULL
+  /**
+   * 
+   * @param orderid 
+   * 
+   * Ricava il prossimo carico relativo all'ordine "orderid"
+   * Per farlo cerca fra i carichi relativi tale ordine quelli con timestamp nullo, quindi non eseguiti, ricavando solo quello con "index" più basso
+   * Nel caso siano stati eseguiti tutti i carichi, restituirà undefined
+   */ 
   export async function getNext(orderid: number) {
+    // find the lowest INDEX between all the LOADS with ORDER= orderid and TIMESTAMP=NULL
     const load = await Load.findOne({
-      where: { orderid: orderid, timestamp: null }, // TODO eventually change to actual_d: null
+      where: { orderid: orderid, timestamp: null },
       order: [['index', 'ASC']], // findOne restituirà il solo elemento con index più basso, fra quelli selezionati nella where
       include: Food
     });
-    console.log('NEXT');
-    console.log( load? load.dataValues : undefined);
     return load? load.dataValues : undefined;
   }
 
+  // seleziona tutti i carichi relativi un ordine "orderdid"
   export async function getLoadsByOrder(orderid: number) {
     const retval:any = await Load.findAll({
       where: { orderid: orderid},
@@ -104,6 +110,7 @@ export default Load;
     return retval;
   }
 
+  // seleziona tutti i carichi ESEGUITI relativi un ordine "orderdid"
   export async function getCompletedOrder(orderid: number) {
     const retval:any = await Load.findAll({
       where: { orderid: orderid, timestamp: {[Op.ne]:null} },
@@ -111,6 +118,7 @@ export default Load;
     return retval;
   }
 
+  // seleziona tutti i carichi relativi un dato periodo, evetualmente illimitato
   export async function getLoadsInPeriod(start?: Date, end?: Date) {
     
     const filter = (start&&end)? {
@@ -134,6 +142,15 @@ export default Load;
     return retval;
   }
 
+  /**
+   * 
+   * @param order 
+   * @param food 
+   * @param quantity 
+   * 
+   * Funzione associata all'esecuzione di un carico: specifica la quantità caricata effettivamente, "actual_q", con "quantity"
+   * inoltre, assegna il timestamp attuale alla colonna "timestamp"
+   */
   export async function doLoad(order: number, food: number, quantity: number) {
     const load= await Load.update(
       {

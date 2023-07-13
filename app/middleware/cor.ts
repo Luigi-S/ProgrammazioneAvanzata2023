@@ -28,13 +28,11 @@ export const updToken = [
 ];
 
 export const validNewFood = [
-    // TODO controllare se UNIQUE di name funziona, in caso contrario, aggiungere middleware per controllo nome originale
     FeedMiddleware.checkFoodExistsByName,
     FeedMiddleware.checkQuantityPositive
 ];
 
 export const validUpdFood = [
-    // TODO controllare se UNIQUE di name funziona, in caso contrario, aggiungere middleware per controllo nome originale
     FeedMiddleware.checkFoodExists,
     FeedMiddleware.checkFoodExistsByName,
     FeedMiddleware.checkQuantityPositive
@@ -61,6 +59,7 @@ export const addLoad = [
     OrdersMiddleware.checkOrderExists,
     OrdersMiddleware.checkInExecution,
     OrdersMiddleware.checkIfNext,
+    OrdersMiddleware.checkFoodIdExists,
     OrdersMiddleware.checkActualQuantity
 ]
 

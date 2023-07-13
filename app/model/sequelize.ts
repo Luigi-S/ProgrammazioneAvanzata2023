@@ -1,6 +1,9 @@
 require('dotenv').config();
 import { Sequelize} from "sequelize";
 
+
+// implementazione del pattern Singleton con Sequelize, un unico elemento per accedere al DB
+// ricava dal dotenv i dati relativi la connessione al DB Postgres
 export class SingletonDB {
     private static instance: SingletonDB;
     private singleConnection: Sequelize; 

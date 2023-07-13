@@ -7,13 +7,13 @@ import { public_key } from '../server';
 
 require('dotenv').config();
 
-const TOKEN_COST: number = 0;
-
+// verifica che l'header della request sia presente
 export function checkAuthHeader (req: any, res: any, next: any): void{
     if (req.headers.authorization) next();
     else next(Message.no_auth_header_message);
 }
 
+// verifica che nell'header sia presente un token JWT
 export function checkToken(req: any, res: any, next: any): void{
     const bearerHeader: string = req.headers.authorization;
     if (typeof bearerHeader !== 'undefined'){
@@ -23,6 +23,7 @@ export function checkToken(req: any, res: any, next: any): void{
     } else next(Message.missing_token_message);
 }
 
+// verifica la validità del token e ne estrae i dati della richiesta, asseganti al req.body 
 export function verifyAndAuthenticate(req: any, res: any, next: any): void{
     try {
         const decoded: string | jwt.JwtPayload  = jwt.verify(req.token, public_key, { algorithm:'RS256'});
@@ -44,6 +45,7 @@ export function isAdmin(req: any, res: any, next: any): void{
     }
 }
 
+// verifica che l'email associata al token jwt corrisponda ad un user esistente
 export function checkOwnerExists(req: any, res: any, next: any): void{
     Users.getUser(req.body.user).then((value)=>{
         if(value){
@@ -58,9 +60,9 @@ export function checkOwnerExists(req: any, res: any, next: any): void{
     });
 }
 
-
+// varifica che  l'email associata al token jwt corrisponda ad un user con almeno un token
 export function checkTokenAmount(req: any, res: any, next: any): void{
-    if(req.body.user.token>TOKEN_COST){
+    if(req.body.user.token>= Users.TOKEN_COST){
         next();
     }else{
         next(Message.unauthorized_message);
