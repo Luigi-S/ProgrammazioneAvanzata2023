@@ -10,7 +10,7 @@ export function createOrder(req:any, res:any, next:any){
     const loads : Array<{food: number, quantity: number}> =  req.body.loads;
     let arr : Array<{foodid: number, orderid: number, requested_q: number, index: number,}>= [];
 
-    Orders.createOrder().then((order:any)=>{
+    Orders.createOrder().then((order:Orders.Order)=>{
         loads.forEach((value, index) =>{
             arr.push({foodid: value.food, orderid: order.id, requested_q: value.quantity, index:index});
         });
@@ -19,7 +19,7 @@ export function createOrder(req:any, res:any, next:any){
             res.status(HttpStatus.CREATED).json({message: Message.order_created_message, orderid: order, loads: loads});
             next();
         }).catch((err) => {
-            Orders.destroyOrder(order.id).then((value)=>{
+            Orders.destroyOrder(order.id).then(()=>{
                 next(Error(Message.internal_server_error_message));
             });
         });
@@ -28,7 +28,7 @@ export function createOrder(req:any, res:any, next:any){
 }
 
 export function takeOrder(req:any, res:any, next:any){
-    Orders.setState(req.params.id, Orders.OrderState.IN_ESECUZIONE).then((value)=>{
+    Orders.takeOrder(req.params.id).then((value)=>{
         Users.payToken(req.body.user.email);
         res.status(HttpStatus.OK).json({message: Message.order_taken_message, order: value});
         next();
@@ -36,14 +36,14 @@ export function takeOrder(req:any, res:any, next:any){
 }
 
 export function getOrderState(req:any, res:any, next:any){
-    const order: any = req.body.order;
-    if(order.state == Orders.OrderState.COMPLETATO){
+    const order = req.body.order;
+    if(order.state == Orders.OrderState.IN_ESECUZIONE){
         Loads.getLoadsByOrder(order.id).then((value)=>{
             Users.payToken(req.body.user.email);
             res.status(HttpStatus.OK).json({orderid: order.id, loads: value});
             next();
         });
-    }else if(order.state == Orders.OrderState.IN_ESECUZIONE){
+    }else if(order.state == Orders.OrderState.COMPLETATO){
         Loads.getCompletedOrder(order.id).then((value)=>{
             let loads : Array<{food: number, requested_q: number, actual_q: number, diff_q: number }> =[];
             value.forEach((elem: any)=>{
@@ -55,7 +55,11 @@ export function getOrderState(req:any, res:any, next:any){
                 });
             });
             Users.payToken(req.body.user.email);
-            res.status(HttpStatus.OK).json({orderid: order.id, duration: (order.finish - order.start), loads: loads});
+            let diff = '';
+            if (order.finish && order.start){
+                diff = ((order.finish.getTime() - order.start.getTime()) / (1000*60*60)).toFixed(2) + ' ore';
+            }
+            res.status(HttpStatus.OK).json({orderid: order.id, duration: diff , loads: loads});
             next();
         });
     }else{
@@ -69,7 +73,7 @@ export function getOrderList(req:any, res:any, next:any){
     Loads.getLoadsInPeriod(req.query.start, req.query.end).then((value)=>{
         let retval ={};
 
-        value.forEach((loads: any)=>{
+        value.forEach((loads)=>{
             const elem = loads.dataValues;
             const load = {
                 food: elem.foodid,
@@ -82,15 +86,16 @@ export function getOrderList(req:any, res:any, next:any){
                 retval[elem.orderid].loads.push(load);
             }else{
                 retval[elem.orderid] = {
-                    state: elem.order.state,
-                    start: elem.order.start,
-                    finish: elem.order.finish,
+                    state: elem.Order.state,
+                    start: elem.Order.start,
+                    finish: elem.Order.finish,
                     loads:[load]};
             }
         });
         res.status(HttpStatus.OK).json({start: req.query.start, end: req.query.end, loads: retval});
         next();
     }).catch((err)=>{
+        console.log(err);
         next(Error(Message.internal_server_error_message))
     }); // TODO implementare caso di data malformed
 }
@@ -101,13 +106,13 @@ export async function failOrder(orderid: number){
 }
 
 export async function completeOrder(orderid: number){
-    const order = await Orders.setState(orderid, Orders.OrderState.COMPLETATO);
+    const order = await Orders.finishOrder(orderid);
     return order;
 }
 
 async function addLoadAsync(req:any, res:any){
     const body = req.body;
-    const load: any = await Loads.doLoad(body.order.id, body.food.id, body.quantity);
+    await Loads.doLoad(body.order.id, body.food.id, body.quantity);
     await Feed.takeFood(body.quantity, body.food.id);
     const nxt: any = await Loads.getNext(req.params.id);
     if(!nxt){

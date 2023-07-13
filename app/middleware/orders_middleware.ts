@@ -21,7 +21,7 @@ export function checkValidOrder(req: any, res: any, next: any): void{
     
     loads.forEach((elem)=>{
         if(elem.quantity > 0){
-            Feed.getFood(elem.food).then((value:any)=>{
+            Feed.getFood(elem.food).then((value:Feed.Food)=>{
                 console.log(value);
                 if(value){
                     if(value.quantity < elem.quantity){
@@ -40,7 +40,8 @@ export function checkValidOrder(req: any, res: any, next: any): void{
 }
 
 export function checkOrderExists(req: any, res: any, next: any): void{
-    Orders.getOrder(req.params.id).then((value:any)=>{
+    Orders.getOrder(req.params.id).then((value)=>{
+        console.log(value);
         if(value){
             req.body.order = value;
             next();
@@ -48,7 +49,9 @@ export function checkOrderExists(req: any, res: any, next: any): void{
             // order does not exist
             next(Error(Message.bad_request_msg));
         }
-    }).catch(()=>{next(Error(Message.bad_request_msg));});
+    }).catch((err)=>{
+        console.log(err);
+        next(Error(Message.bad_request_msg));});
 }
 
 export function checkInExecution(req: any, res: any, next: any): void{
@@ -75,20 +78,22 @@ export function checkFoodIdExists(req:any, res:any, next:any){
         }else{
             next(Error(Message.unexisting_food_message));
         }
-    }).catch(()=>{
+    }).catch((err)=>{
+
+        console.log(err);
         next(Error(Message.bad_request_msg));
     });
 }
 
 export function checkIfNext(req: any, res: any, next: any): void{
     
-    Loads.getNext(req.params.id).then((value:any)=>{
+    Loads.getNext(req.params.id).then((value)=>{
         if(!value){
             next(Error(Message.not_next_message));
         }
         if(value.foodid === req.body.food){
             req.body.requested_q = value.requested_q;
-            req.body.food = value.food.dataValues;
+            req.body.food = value.Food.dataValues;
             next();
         }else{
             OrderController.failOrder(value.orderid);

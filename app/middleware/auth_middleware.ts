@@ -53,6 +53,7 @@ export function checkOwnerExists(req: any, res: any, next: any): void{
             next(Error(Message.bad_request_msg));
         }
     }).catch((err)=>{
+        console.log(err);
         next(Error(Message.bad_request_msg));
     });
 }

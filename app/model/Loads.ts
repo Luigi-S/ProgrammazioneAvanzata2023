@@ -1,4 +1,4 @@
-import { DataTypes } from "sequelize";
+import { Model, DataTypes } from "sequelize";
 import {Food} from './Feed';
 import {Order} from './Orders';
 
@@ -7,55 +7,68 @@ import { SingletonDB } from "./sequelize";
 const sequelize = SingletonDB.getInstance().getConnection();
 const { Op } = require("sequelize");
 
-const Load = sequelize.define(
-    "loads",
-    {
-      foodid: {
-        type: DataTypes.INTEGER,
-        primaryKey: true,
-        allowNull: false,
-      },
-      orderid: {
-        type: DataTypes.INTEGER,
-        primaryKey: true,
-        allowNull: false,
-      },
-      index: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-      },
-      requested_q: {
-        type: DataTypes.REAL,
-        allowNull: false,
-      },
-      actual_q: {
-        type: DataTypes.REAL,
-        allowNull: true,
-      },
-      timestamp: {
-        type: DataTypes.DATEONLY,
-        allowNull: true,  
-      }
-    },
-    {
-      modelName: "loads",
-      timestamps: false,
-    }
-  );
+class Load extends Model {
+  public foodid!: number;
+  public orderid!: number;
+  public index!: number;
+  public requested_q!: number;
+  public actual_q!: number | null;
+  public timestamp!: Date | null;
+}
 
-  Load.belongsTo(Food, {
-    foreignKey: 'foodid'
-  });
-  Food.hasMany(Load, {
-    foreignKey: 'foodid'
-  });
-  Load.belongsTo(Order, {
-    foreignKey: 'orderid'
-  });
-  Order.hasMany(Load, {
-    foreignKey: 'orderid',
-    onDelete: 'CASCADE',
-  });
+Load.init(
+  {
+    foodid: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      allowNull: false,
+    },
+    orderid: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      allowNull: false,
+    },
+    index: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    requested_q: {
+      type: DataTypes.FLOAT,
+      allowNull: false,
+    },
+    actual_q: {
+      type: DataTypes.FLOAT,
+      allowNull: true,
+    },
+    timestamp: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
+  },
+  {
+    sequelize,
+    modelName: 'Load',
+    tableName: 'loads',
+    timestamps: false,
+  }
+);
+
+Load.belongsTo(Food, {
+  foreignKey: 'foodid',
+});
+Food.hasMany(Load, {
+  foreignKey: 'foodid',
+});
+
+Load.belongsTo(Order, {
+  foreignKey: 'orderid',
+});
+Order.hasMany(Load, {
+  foreignKey: 'orderid',
+  onDelete: 'CASCADE',
+});
+
+export default Load;
 
   export async function createLoads(loads: Array<{foodid: number, orderid: number, requested_q: number, index: number,}>){
     const retval = await Load.bulkCreate(

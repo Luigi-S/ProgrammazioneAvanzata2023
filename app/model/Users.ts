@@ -1,4 +1,4 @@
-import { DataTypes } from "sequelize";
+import { Model, DataTypes } from "sequelize";
 
 import { SingletonDB } from "./sequelize";
 const sequelize = SingletonDB.getInstance().getConnection();
@@ -8,8 +8,13 @@ export enum UserRole {
     Generic =1,
 }
 
-const User = sequelize.define(
-  "users",
+export class User extends Model{
+  public email!: string;
+  public token!: number;
+  public role!: UserRole;
+}
+
+User.init(
   {
     email: {
       type: DataTypes.STRING,
@@ -26,7 +31,9 @@ const User = sequelize.define(
     }
   },
   {
-    modelName: "users",
+    sequelize,
+    modelName: "User",
+    tableName: "users",
     timestamps: false,
   }
 );
@@ -37,7 +44,6 @@ export async function getTokenNumber(email: string) {
     attributes: ["token"],
     where: { email: email },
   });
-  console.log(budget);
   return budget;
 }
 
@@ -56,7 +62,7 @@ export async function isRole(role: number, email: string) {
 */
 
 export async function updateToken(newTokenNumber: number, email: string) {
-  const user = await User.update(
+  await User.update(
     {
       token: newTokenNumber,
     },

@@ -7,7 +7,7 @@ var HttpStatus = require('http-status-codes');
 export function createFood(req:any, res:any, next:any){
     const name: string =  req.body.name;
     const quantity: number =  req.body.quantity;
-    Feed.createFood(name, quantity).then((food) => {
+    Feed.createFood(name, quantity).then((food: Feed.Food) => {
       Users.payToken(req.body.user.email);
       res.status(HttpStatus.CREATED).json({message: Message.food_created_message, food: food});
       next();

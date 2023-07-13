@@ -10,7 +10,7 @@ export function checkAmountPositive(req: any, res: any, next: any): void{
 }
 
 export function checkUserExists(req: any, res: any, next: any): void{
-    Users.getUser(req.body.user_email).then((value:any)=>{
+    Users.getUser(req.body.user_email).then((value)=>{
         if(value){
             next();
         }else{

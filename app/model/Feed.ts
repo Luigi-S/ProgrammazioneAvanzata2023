@@ -1,9 +1,40 @@
-import { DataTypes } from "sequelize";
+import { Model, DataTypes } from "sequelize";
 import * as Message from '../utils/messages'
 
 import { SingletonDB } from "./sequelize";
 const sequelize = SingletonDB.getInstance().getConnection();
 
+export class Food extends Model{
+  public id!: number;
+  public quantity!: number;
+  public name!: string;
+}
+  
+Food.init(
+  {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true
+    },
+    quantity: {
+      type: DataTypes.REAL,
+      allowNull: false,
+    },
+    name: {
+      type: DataTypes.STRING,
+      unique: true,
+      allowNull: false,
+    }
+  },
+  {
+    sequelize,
+    tableName:"foods",
+    modelName: "Food",
+    timestamps: false,
+  }
+);
+/*
 export const Food = sequelize.define(
   "foods",
   {
@@ -27,6 +58,7 @@ export const Food = sequelize.define(
     timestamps: false,
   }
 );
+*/
 
 export async function createFood (name: string, quantity: number) {
   const retval = await Food.create({name:name, quantity:quantity});
@@ -57,7 +89,7 @@ export async function getFoodByName(name: string) {
 
 
 
-export async function updateFood( id: number, quantity: number = undefined, name: string = undefined) {
+export async function updateFood( id: number, quantity?: number, name?: string) {
   let newVal;
   if(name && quantity){
     newVal = {name: name, quantity: quantity};
@@ -83,3 +115,4 @@ export async function updateFood( id: number, quantity: number = undefined, name
 export async function takeFood(quantity: number, id: number) {
   await Food.decrement(['quantity'], {by: quantity, where: { id: id } });
 }
+
