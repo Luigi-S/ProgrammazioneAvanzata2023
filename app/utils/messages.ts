@@ -7,10 +7,17 @@ export const success_load_message: string = "SUCCESS - Load data successfully ad
 export const token_updated_message: string = "SUCCESS - User's token amount updated successfully";
 
 // ERRORS
-import { ErrData } from "./errors";
+export class ErrData{
+    msg:string;
+    status:number;
+    constructor(msg:string, status:number){
+        this.msg = msg;
+        this.status = status;
+    }
+}
 var HttpStatus = require('http-status-codes');
 
-export const not_found_msg: ErrData = new ErrData("ERROR - Not found", HttpStatus.NOT_FOUND );
+export const not_found_msg: ErrData = new ErrData("ERROR - Not found", HttpStatus.NOT_FOUND);
 export const bad_request_msg: ErrData = new ErrData("ERROR - Bad request", HttpStatus.BAD_REQUEST);
 export const no_payload_msg: ErrData = new ErrData("Bad Request - No JSON payload header", HttpStatus.BAD_REQUEST);
 export const no_auth_header_message: ErrData = new ErrData("Bad Request - No authorization header", HttpStatus.BAD_REQUEST);
