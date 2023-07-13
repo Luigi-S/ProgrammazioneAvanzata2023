@@ -99,7 +99,7 @@ export async function updateFood( id: number, quantity?: number, name?: string) 
     newVal = {quantity: quantity};
   }
   if(newVal===undefined){
-      throw Error(Message.bad_request_msg)
+      throw Error(Message.bad_request_msg.msg);
   }
   const food = await Food.update(
     newVal,

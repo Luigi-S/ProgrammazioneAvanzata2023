@@ -20,7 +20,7 @@ export function createOrder(req:any, res:any, next:any){
             next();
         }).catch((err) => {
             Orders.destroyOrder(order.id).then(()=>{
-                next(Error(Message.internal_server_error_message));
+                next(Message.internal_server_error_message);
             });
         });
     });
@@ -96,7 +96,7 @@ export function getOrderList(req:any, res:any, next:any){
         next();
     }).catch((err)=>{
         console.log(err);
-        next(Error(Message.internal_server_error_message))
+        next(Message.internal_server_error_message);
     }); // TODO implementare caso di data malformed
 }
 
@@ -126,5 +126,5 @@ export function addLoad(req:any, res:any, next:any){
         Users.payToken(req.body.user.email);
         res.status(HttpStatus.OK).json({message: Message.success_load_message});
         next();
-    }).catch((err)=>{next(err);});
+    }).catch((err)=>{next(Message.internal_server_error_message);});
 }

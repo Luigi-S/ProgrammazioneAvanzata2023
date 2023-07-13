@@ -11,7 +11,7 @@ export function createFood(req:any, res:any, next:any){
       Users.payToken(req.body.user.email);
       res.status(HttpStatus.CREATED).json({message: Message.food_created_message, food: food});
       next();
-    }).catch((err) => {next(Error(Message.internal_server_error_message)); });
+    }).catch((err) => {next(Message.internal_server_error_message); });
 }
 
 export async function checkFoodExists(id: number){
@@ -34,10 +34,10 @@ export function updateFood(req:any, res:any, next:any){
         res.status(HttpStatus.OK).json({message: Message.food_updated_message, food: food});
         next();
     }).catch((err) => {
-        if(err.message === Message.bad_request_msg){
-            next(err);
+        if(err.message === Message.bad_request_msg.msg){
+            next(Message.bad_request_msg);
         } else{
-            next(Error(Message.internal_server_error_message));
+            next(Message.internal_server_error_message);
         }
     });
 }

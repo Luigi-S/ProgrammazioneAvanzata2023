@@ -5,7 +5,7 @@ export function checkAmountPositive(req: any, res: any, next: any): void{
     if(req.body.tokens>0){
         next();
     }else{
-        next(Error(Message.bad_request_msg));
+        next(Message.bad_request_msg);
     }
 }
 
@@ -14,7 +14,7 @@ export function checkUserExists(req: any, res: any, next: any): void{
         if(value){
             next();
         }else{
-            next(Error(Message.bad_request_msg));
+            next(Message.bad_request_msg);
         }
     });
 }

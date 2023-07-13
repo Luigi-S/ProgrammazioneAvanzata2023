@@ -6,10 +6,10 @@ export function checkQuantityPositive (req: any, res: any, next: any): void{
         if(req.body.quantity > 0){
             next();
         }else{
-            next(Error(Message.malformed_payload_message));
+            next(Message.malformed_payload_message);
         }
     } catch (error) { 
-        next(Error(Message.malformed_payload_message))
+        next(Message.malformed_payload_message);
     }
 }
 
@@ -18,10 +18,10 @@ export function checkFoodExists (req: any, res: any, next: any): void{
         if(value){
             next();
         }else{
-            next(Error(Message.unexisting_food_message));
+            next(Message.unexisting_food_message);
         }
     }).catch((error) => { 
-        next(Error(Message.malformed_payload_message));
+        next(Message.malformed_payload_message);
     });
 }
 
@@ -30,9 +30,9 @@ export function checkFoodExistsByName (req: any, res: any, next: any): void{
         if(!value){
             next();
         }else{
-            next(Error(Message.already_existing_food_message));
+            next(Message.already_existing_food_message);
         }
     }).catch((error) => { 
-        next(Error(Message.malformed_payload_message));
+        next(Message.malformed_payload_message);
     });
 }

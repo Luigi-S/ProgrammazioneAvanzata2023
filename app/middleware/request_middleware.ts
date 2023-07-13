@@ -4,7 +4,7 @@ import * as Message from '../utils/messages'
 
 export function notFound(req: any, res: any, next: any) {
     console.log(Message.not_found_msg);
-    next(Error(Message.not_found_msg));
+    next(Message.not_found_msg);
 }
 
 

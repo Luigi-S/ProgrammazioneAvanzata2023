@@ -7,28 +7,31 @@ export const success_load_message: string = "SUCCESS - Load data successfully ad
 export const token_updated_message: string = "SUCCESS - User's token amount updated successfully";
 
 // ERRORS
-export const not_found_msg: string = "ERROR - Not found";
-export const bad_request_msg: string = "ERROR - Bad request";
-export const no_payload_msg: string = "Bad Request - No JSON payload header";
-export const no_auth_header_message: string = "Bad Request - No authorization header";
+import { ErrData } from "./errors";
+var HttpStatus = require('http-status-codes');
 
-export const missing_token_message: string = "Bad Request - Missing JWT Token";
-export const invalid_token_message: string = "Forbidden - Invalid JWT Token";
-export const malformed_payload_message: string = "Bad Request - Malformed payload";
-export const unauthorized_message: string = "ERROR - Unauthorized";
+export const not_found_msg: ErrData = new ErrData("ERROR - Not found", HttpStatus.NOT_FOUND );
+export const bad_request_msg: ErrData = new ErrData("ERROR - Bad request", HttpStatus.BAD_REQUEST);
+export const no_payload_msg: ErrData = new ErrData("Bad Request - No JSON payload header", HttpStatus.BAD_REQUEST);
+export const no_auth_header_message: ErrData = new ErrData("Bad Request - No authorization header", HttpStatus.BAD_REQUEST);
 
-export const internal_server_error_message: string = "ERROR - Internal server error";
-export const unexisting_food_message: string = "Bad Request - Food not in database";
-export const exceeded_quantity_message: string = "Bad Request - Your request exceeds storage";
-export const already_taken_order_message: string = "Bad Request - Order is already taken or completed";
+export const missing_token_message: ErrData = new ErrData("Bad Request - Missing JWT Token", HttpStatus.BAD_REQUEST);
+export const invalid_token_message: ErrData = new ErrData("Forbidden - Invalid JWT Token", HttpStatus.UNAUTHORIZED);
+export const malformed_payload_message: ErrData = new ErrData("Bad Request - Malformed payload", HttpStatus.BAD_REQUEST);
+export const unauthorized_message: ErrData = new ErrData("ERROR - Unauthorized", HttpStatus.UNAUTHORIZED);
 
-export const not_next_message: string = "ORDER FAILED - The food loaded is in incorrect order";
-export const unacceptable_q_message: string = "ORDER FAILED - The food loaded is in uncceptable quantity";
-export const not_enough_stored_message: string = "ORDER FAILED - The food loaded is in uncceptable quantity";
-export const already_existing_food_message: string = "Bad Request - Name selected for this food is already taken";
+export const internal_server_error_message: ErrData = new ErrData("ERROR - Internal server error", HttpStatus.INTERNAL_SERVER_ERROR);
+export const unexisting_food_message: ErrData = new ErrData("Bad Request - Food not in database", HttpStatus.BAD_REQUEST);
+export const exceeded_quantity_message: ErrData = new ErrData("Bad Request - Your request exceeds storage", HttpStatus.BAD_REQUEST);
+export const already_taken_order_message: ErrData = new ErrData("Bad Request - Order is already taken or completed", HttpStatus.BAD_REQUEST);
 
-export const not_executing_order_message: string = "LOAD FAILED - The order selected is not in execution, cannot load food";
-export const repeated_food_message: string = "Bad request - Your order has repeated food(s), not allowed";
+export const not_next_message: ErrData = new ErrData("ORDER FAILED - The food loaded is in incorrect order", HttpStatus.INTERNAL_SERVER_ERROR);
+export const unacceptable_q_message: ErrData = new ErrData("ORDER FAILED - The food loaded is in uncceptable quantity", HttpStatus.BAD_REQUEST);
+export const not_enough_stored_message: ErrData = new ErrData("ORDER FAILED - The food loaded is in uncceptable quantity", HttpStatus.BAD_REQUEST);
+export const already_existing_food_message: ErrData = new ErrData("Bad Request - Name selected for this food is already taken", HttpStatus.BAD_REQUEST);
+
+export const not_executing_order_message: ErrData = new ErrData("LOAD FAILED - The order selected is not in execution, cannot load food", HttpStatus.INTERNAL_SERVER_ERROR);
+export const repeated_food_message: ErrData = new ErrData("Bad request - Your order has repeated food(s), not allowed", HttpStatus.BAD_REQUEST);
 
 
-export const no_loads_msg: string = 'There are no loads associated with this order'
+export const no_loads_msg: ErrData = new ErrData('There are no loads associated with this order', HttpStatus.BAD_REQUEST);
