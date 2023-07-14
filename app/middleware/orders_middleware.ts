@@ -133,7 +133,13 @@ export function checkIfNext(req: any, res: any, next: any): void{
  */
 export function checkActualQuantity(req: any, res: any, next: any): void{ 
     require('dotenv').config();
-    const N: number = parseFloat(process.env.N as string)/100;
+    let N_string: string;
+    try{
+        N_string =process.env.N as string;
+    }catch{
+        N_string = '0';
+    }
+    const N = parseFloat(N_string)/100;
     const min_accepted = req.body.requested_q*(1-N);
     const max_accepted = req.body.requested_q*(1+N);
     if(req.body.quantity>=min_accepted && req.body.quantity<=max_accepted){
