@@ -3,6 +3,11 @@ import * as Message from '../utils/messages'
 
 var HttpStatus = require('http-status-codes');
 
+export async function getUser(email:string) {
+    const user = await Users.getUser(email);
+    return user;    
+}
+
 /**
  * @param req
  * @param res 

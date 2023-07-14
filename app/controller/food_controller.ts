@@ -63,3 +63,9 @@ export function updateFood(req:any, res:any, next:any){
         }
     });
 }
+
+
+export async function getFood(food_id:number){
+    const food = await Feed.getFood(food_id);
+    return food;
+}

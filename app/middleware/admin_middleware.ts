@@ -1,4 +1,4 @@
-import * as Users from '../model/Users'
+import * as UserController from '../controller/user_controller'
 import * as Message from '../utils/messages'
 
 // controlla che "tokens" sia positivo
@@ -12,7 +12,7 @@ export function checkAmountPositive(req: any, res: any, next: any): void{
 
 // controlla che "user_email" sia un utente esistente
 export function checkUserExists(req: any, res: any, next: any): void{
-    Users.getUser(req.body.user_email).then((value)=>{
+    UserController.getUser(req.body.user_email).then((value)=>{
         if(value){
             next();
         }else{

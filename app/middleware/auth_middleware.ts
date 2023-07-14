@@ -1,7 +1,7 @@
-import * as Users from '../model/Users';
+import * as UserController from '../controller/user_controller'
 import * as jwt from 'jsonwebtoken';
 import * as Message from '../utils/messages';
-import { UserRole } from '../model/Users';
+import { UserRole, TOKEN_COST } from '../model/Users';
 import { public_key } from '../server';
 
 
@@ -47,7 +47,7 @@ export function isAdmin(req: any, res: any, next: any): void{
 
 // verifica che l'email associata al token jwt corrisponda ad un user esistente
 export function checkOwnerExists(req: any, res: any, next: any): void{
-    Users.getUser(req.body.user).then((value)=>{
+    UserController.getUser(req.body.user).then((value)=>{
         if(value){
             req.body.user = value,
             next();
@@ -62,7 +62,7 @@ export function checkOwnerExists(req: any, res: any, next: any): void{
 
 // varifica che  l'email associata al token jwt corrisponda ad un user con almeno un token
 export function checkTokenAmount(req: any, res: any, next: any): void{
-    if(req.body.user.token>= Users.TOKEN_COST){
+    if(req.body.user.token>= TOKEN_COST){
         next();
     }else{
         next(Message.unauthorized_message);

@@ -3,7 +3,7 @@ import * as Middleware from './middleware/cor'
 
 import * as FoodController from './controller/food_controller'
 import * as OrderController from './controller/order_controller'
-import * as AdminController from './controller/admin_controller'
+import * as UserController from './controller/user_controller'
 
 
 const PORT = parseInt(process.env.PORT as string);
@@ -54,7 +54,7 @@ app.post('/load/:id', Middleware.auth, Middleware.addLoad, function (req: any, r
 
 // 8) POST /admin/token -> re-impostare il numero token di un utente + user_id, token_amount
 app.post('/admin/token', Middleware.isAdmin, Middleware.updToken, function (req: any, res: any, next:any) {    
-  AdminController.updateToken(req, res, next);
+  UserController.updateToken(req, res, next);
 });
 
 

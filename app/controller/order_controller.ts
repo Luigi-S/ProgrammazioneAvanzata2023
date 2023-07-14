@@ -6,6 +6,11 @@ import * as Message from '../utils/messages'
 
 var HttpStatus = require('http-status-codes');
 
+export async function getOrder(order_id: number){
+    const order = await Orders.getOrder(order_id);
+    return order;
+}
+
 /**
  * 
  * @param req 
@@ -181,4 +186,9 @@ export function addLoad(req:any, res:any, next:any){
         res.status(HttpStatus.OK).json({message: Message.success_load_message});
         next();
     }).catch((err)=>{next(Message.internal_server_error_message);});
+}
+
+export async function getNext(order_id: number){
+    const nxt = await Loads.getNext(order_id);
+    return nxt;
 }

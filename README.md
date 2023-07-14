@@ -25,9 +25,9 @@ Nella tabella che segue, sono descritte le rotte implementate nell'applicazione,
 Creazione di un nuovo alimento, per farlo si utilizza un token generato con un payload JSON di questo tipo:
 ```
 {
-    "user": "\<utente\>",
-    "name": "\<nome-alimento\>",
-    "quantity": \<disponibiltà-alimento\>
+    "user": "<utente>",
+    "name": "<nome-alimento>",
+    "quantity": <disponibiltà-alimento>
 }
 ```
 Dove: 'user' identifica l'utente che esegue la richiesta, 'name' è il nome associato all'alimento, che non deve essere già impiegato e 'quantity' è il numero, positivo, che indica la quantità del nuovo alimento disponibile.
@@ -39,11 +39,11 @@ Aggiornare un alimento, identificato dal parametro \<id\>, il payload è analogo
 Creazione di un nuovo ordine, prevede che si specifichi nel payload un array 'loads', composto dagli alimenti richiesti, identificati dal numero di id 'food' e dalla quantità richiesta, 'quantity'. Verrà restituito l'id dell'ordine, se correttamente creata l'istanza nel DB.
 ```
 {
-    "user": "\<utente\>",
+    "user": "<utente>",
     "loads":[
         {
-            "food": \<id-alimento\>,
-            "quantity": \<quantità-richiesta\>
+            "food": <id-alimento>,
+            "quantity": <quantità-richiesta>
         },
         ...
     ]
@@ -55,7 +55,7 @@ L'ordine è rifiutato se la quantità richiesta di un alimento è nulla, negativ
 Presa in carico di un ordine, il payload include solo l'utente al quale verrà scalato il token, l'ordine corrispondente l'id indicato come parametro nella rotta è preso in carico, lo stato passa a 'IN ESECUZIONE' e sarà possibile eseguire i carichi con la rotta /load/\<id\>.
 ```
 {
-    "user": "\<utente\>"
+    "user": "<utente>"
 }
 ```
 
@@ -66,9 +66,9 @@ Rotta che permette di verificare lo stato di esecuzione di un ordine specificand
 Effettua un carico relativo l'ordine identificato da \<id\>. Il payload è della forma:
 ```
 {
-    "user": "\<utente\>",
-    "food": \<id-alimento\>,
-    "quantity": \<quantità-caricata\>
+    "user": "<utente>",
+    "food": <id-alimento>,
+    "quantity": <quantità-caricata>
 }
 ```
 Si otterrà response con bad request, se non esiste un alimento con id \<food\>, o se 'quantity' non è positiva. Si avrà invece che l'ordine è fallito, 'state' passa a 'FALLITO', se: 'food' non corrisponde ad un alimento facente parte dell'ordine, o se non rispetta la sequenza di carico, oppure se la quantità caricata si discosta da quella richiesta oltre un certo margine, indicato dalla variabile di ambiente N, specificata nel file .env (se N non è indicata, il margine è nullo).
@@ -79,9 +79,9 @@ Rotta che non richiede autorizzazione di alcun tipo, restituisce un json, 'loads
 ### POST /admin/token
 ```
 {
-    "user": "\<admin\>",
-    "user_email": \<user-destinazione\>,
-    "tokens": \<nuovo-numero-token\>
+    "user": "<admin>",
+    "user_email": <user-destinazione>,
+    "tokens": <nuovo-numero-token>
 }
 ```
 Se "user" corrisponde ad un account con "role" Admin, "user_email" ad un account valido e  "tokens" non è negativo, il credito di token dell'utente identificato da "user_email", è aggiornato al nuovo valore "token".
@@ -126,7 +126,7 @@ cat jwtRS256.key.pub
 ```
 Generate le chiavi, creare il file .env, o se già esistente, verificare che sia della forma:
 ```
-N= \<value\>
+N= <value>
 PORT=8080
 HOST='0.0.0.0'
 ```

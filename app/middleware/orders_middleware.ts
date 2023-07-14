@@ -1,8 +1,9 @@
-import * as Feed from '../model/Feed'
-import * as Orders from '../model/Orders'
-import * as Loads from '../model/Loads'
-import * as Message from '../utils/messages'
+import * as FoodController from '../controller/food_controller'
 import * as OrderController from '../controller/order_controller'
+import { Food } from '../model/Feed'
+import { OrderState} from '../model/Orders'
+import * as Message from '../utils/messages'
+
 
 const DATE_FORMATS = ['DD-MM-YYYY', 'DD/MM/YYYY'];
 /**
@@ -29,7 +30,7 @@ export function checkValidOrder(req: any, res: any, next: any): void{
     
     loads.forEach((elem)=>{
         if(elem.quantity > 0){
-            Feed.getFood(elem.food).then((value:Feed.Food)=>{
+            FoodController.getFood(elem.food).then((value: Food)=>{
                 console.log(value);
                 if(value){
                     if(value.quantity < elem.quantity){
@@ -52,7 +53,7 @@ export function checkValidOrder(req: any, res: any, next: any): void{
  * Controllo che l'ordine indicato da parametro "id" esista, altrimenti -> bad request 
  */
 export function checkOrderExists(req: any, res: any, next: any): void{
-    Orders.getOrder(req.params.id).then((value)=>{
+    OrderController.getOrder(req.params.id).then((value)=>{
         if(value){
             req.body.order = value;
             next();
@@ -69,7 +70,7 @@ export function checkOrderExists(req: any, res: any, next: any): void{
  * Controllo che l'ordine indicato da parametro "id" abbia "state" pari ad IN_ESECUZIONE, altrimenti -> not executing 
  */
 export function checkInExecution(req: any, res: any, next: any): void{
-    if(req.body.order.state !== Orders.OrderState.IN_ESECUZIONE){
+    if(req.body.order.state !== OrderState.IN_ESECUZIONE){
         next( Message.not_executing_order_message);
     }else{
         next();
@@ -81,7 +82,7 @@ export function checkInExecution(req: any, res: any, next: any): void{
  * Controllo che l'ordine indicato da parametro "id" abbia stato "CREATO", altrimenti -> already taken
  */
 export function checkOrderNotStarted(req: any, res: any, next: any): void{
-    if(req.body.order.state==Orders.OrderState.CREATO){
+    if(req.body.order.state === OrderState.CREATO){
         next();
     }else{
         // richiesta già presa in carico, completata o fallita -> non è possibile prenderela in carico
@@ -93,7 +94,7 @@ export function checkOrderNotStarted(req: any, res: any, next: any): void{
  * Controllo che l'alimento indicato da parametro "food" esista, altrimenti -> unexisting food 
  */
 export function checkFoodIdExists(req:any, res:any, next:any){
-    Feed.getFood(req.body.food).then((value)=>{
+    FoodController.getFood(req.body.food).then((value)=>{
         if(value){
             next();
         }else{
@@ -111,7 +112,7 @@ export function checkFoodIdExists(req:any, res:any, next:any){
  */
 export function checkIfNext(req: any, res: any, next: any): void{
     
-    Loads.getNext(req.params.id).then((value)=>{
+    OrderController.getNext(req.params.id).then((value)=>{
         if(!value){
             next( Message.not_next_message);
         }
