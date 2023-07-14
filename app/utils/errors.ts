@@ -16,8 +16,50 @@ export class ErrorWithStatus {
     toString () { return `{ status: ${this.status}, msg: ${this.err.message} }`;}
 }
 
+class ErrorNotFound extends ErrorWithStatus{
+    constructor(msg: string){
+        super(HttpStatus.NOT_FOUND, Error(msg));
+    }
+}
+
+class ErrorInternal extends ErrorWithStatus{
+    constructor(msg: string){
+        super(HttpStatus.INTERNAL_SERVER_ERROR, Error(msg));
+    }
+}
+
+class ErrorBadRequest extends ErrorWithStatus{
+    constructor(msg: string){
+        super(HttpStatus.BAD_REQUEST, Error(msg));
+    }
+}
+
+class ErrorUnauthorized extends ErrorWithStatus{
+    constructor(msg: string){
+        super(HttpStatus.UNAUTHORIZED, Error(msg));
+    }
+}
+
 // semplice funzione factory, raccolti i dati dell'errore, possibilmente come Message.ErrData o Error, restituisce un'istanza di ErrorWithStatus
 export function getErrorWithStatus(err): ErrorWithStatus{
-    if(err && (err instanceof Message.ErrData) ) return new ErrorWithStatus(err.status, Error(err.msg));
-    else return new ErrorWithStatus(HttpStatus.INTERNAL_SERVER_ERROR, Error(Message.internal_server_error_message.msg));
+    let retval : ErrorWithStatus;
+    if(err && (err instanceof Message.ErrData) ){
+        switch(err.status){
+            case HttpStatus.NOT_FOUND:
+                retval = new ErrorNotFound(err.msg);
+                break;
+            case HttpStatus.UNAUTHORIZED:
+                retval = new ErrorUnauthorized(err.msg);
+                break;
+            case HttpStatus.BAD_REQUEST:
+                retval = new ErrorBadRequest(err.msg);
+                break;
+            default:
+                retval = new ErrorInternal(err.msg);
+                break;
+        }
+    }else{
+        retval = new ErrorInternal(err.msg);
+    }
+    return retval;
 }
