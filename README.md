@@ -13,11 +13,11 @@ Nella tabella che segue, sono descritte le rotte implementate nell'applicazione,
 | Req Method |    Rotta   |Costo token|
 |------------|------------|-----------|
 |    POST    |   /food    |     1     |
-|    PUT     | /food/<id> |     1     |
+|    PUT     | /food/\<id\> |     1     |
 |    POST    |  /order    |     1     |
-|    POST    |/order/<id> |     1     |
-|    GET     |/order/<id> |     1     |
-|    POST    | /load/<id> |     1     |
+|    POST    |/order/\<id\> |     1     |
+|    GET     |/order/\<id\> |     1     |
+|    POST    | /load/\<id\> |     1     |
 |    GET     |   /list    |     0     |
 |    POST    |/admin/token|     0     |
 
@@ -25,25 +25,25 @@ Nella tabella che segue, sono descritte le rotte implementate nell'applicazione,
 Creazione di un nuovo alimento, per farlo si utilizza un token generato con un payload JSON di questo tipo:
 ```
 {
-    "user": "<utente>",
-    "name": "<nome-alimento>",
-    "quantity": <disponibiltà-alimento>
+    "user": "\<utente\>",
+    "name": "\<nome-alimento\>",
+    "quantity": \<disponibiltà-alimento\>
 }
 ```
 Dove: 'user' identifica l'utente che esegue la richiesta, 'name' è il nome associato all'alimento, che non deve essere già impiegato e 'quantity' è il numero, positivo, che indica la quantità del nuovo alimento disponibile.
 
-### PUT: /food/<id>
-Aggiornare un alimento, identificato dal parametro <id>, il payload è analogo a quello per la creazione di un nuovo alimento, tuttavia sia 'name' che 'quantity' sono parametri opzionali, infatti, se non specificati, rimarranno inalterati. Valgono gli stessi criteri della POST per i valori dei parametri accettati, inoltre, la richiesta fallisce se nessuno dei due parametri è specificato.
+### PUT: /food/\<id\>
+Aggiornare un alimento, identificato dal parametro \<id\>, il payload è analogo a quello per la creazione di un nuovo alimento, tuttavia sia 'name' che 'quantity' sono parametri opzionali, infatti, se non specificati, rimarranno inalterati. Valgono gli stessi criteri della POST per i valori dei parametri accettati, inoltre, la richiesta fallisce se nessuno dei due parametri è specificato.
 
 ### POST /order
 Creazione di un nuovo ordine, prevede che si specifichi nel payload un array 'loads', composto dagli alimenti richiesti, identificati dal numero di id 'food' e dalla quantità richiesta, 'quantity'. Verrà restituito l'id dell'ordine, se correttamente creata l'istanza nel DB.
 ```
 {
-    "user": "<utente>",
+    "user": "\<utente\>",
     "loads":[
         {
-            "food": <id-alimento>,
-            "quantity": <quantità-richiesta>
+            "food": \<id-alimento\>,
+            "quantity": \<quantità-richiesta\>
         },
         ...
     ]
@@ -51,27 +51,27 @@ Creazione di un nuovo ordine, prevede che si specifichi nel payload un array 'lo
 ```
 L'ordine è rifiutato se la quantità richiesta di un alimento è nulla, negativa o eccede le disponibilità dell'alimento associato, oppure se l'id dell'alimento non corrisponde ad un elemento a DB, o è ripetuto più volte nell'ordine. L'ordine è creato con stato 'CREATO', non è possibile effettuare i carichi fino all'effettivo inizio dell'esecuzione.
 
-### POST /order/<id>
-Presa in carico di un ordine, il payload include solo l'utente al quale verrà scalato il token, l'ordine corrispondente l'id indicato come parametro nella rotta è preso in carico, lo stato passa a 'IN ESECUZIONE' e sarà possibile eseguire i carichi con la rotta /load/<id>.
+### POST /order/\<id\>
+Presa in carico di un ordine, il payload include solo l'utente al quale verrà scalato il token, l'ordine corrispondente l'id indicato come parametro nella rotta è preso in carico, lo stato passa a 'IN ESECUZIONE' e sarà possibile eseguire i carichi con la rotta /load/\<id\>.
 ```
 {
-    "user": "<utente>"
+    "user": "\<utente\>"
 }
 ```
 
-### GET /order/<id>
-Rotta che permette di verificare lo stato di esecuzione di un ordine specificandone l'<id> nella rotta. Se l'ordine è completato, ovvero se 'state' è 'COMPLETATO', saranno calcolate: la durata complessiva dell'ordine, ovvero la differenza fra 'start', il timestamp della presa in carico, e 'finish', quello dell'ultimo carico, inotre per ogni carico effettuato sarà calcolato lo scarto fra quantità caricata effettivamente, 'actual_q', e quella richiesta, 'requested_q'.
+### GET /order/\<id\>
+Rotta che permette di verificare lo stato di esecuzione di un ordine specificandone l'\<id\> nella rotta. Se l'ordine è completato, ovvero se 'state' è 'COMPLETATO', saranno calcolate: la durata complessiva dell'ordine, ovvero la differenza fra 'start', il timestamp della presa in carico, e 'finish', quello dell'ultimo carico, inotre per ogni carico effettuato sarà calcolato lo scarto fra quantità caricata effettivamente, 'actual_q', e quella richiesta, 'requested_q'.
 
-### POST /load/<id>
-Effettua un carico relativo l'ordine identificato da <id>. Il payload è della forma:
+### POST /load/\<id\>
+Effettua un carico relativo l'ordine identificato da \<id\>. Il payload è della forma:
 ```
 {
-    "user": "<utente>",
-    "food": <id-alimento>,
-    "quantity": <quantità-caricata>
+    "user": "\<utente\>",
+    "food": \<id-alimento\>,
+    "quantity": \<quantità-caricata\>
 }
 ```
-Si otterrà response con bad request, se non esiste un alimento con id <food>, o se 'quantity' non è positiva. Si avrà invece che l'ordine è fallito, 'state' passa a 'FALLITO', se: 'food' non corrisponde ad un alimento facente parte dell'ordine, o se non rispetta la sequenza di carico, oppure se la quantità caricata si discosta da quella richiesta oltre un certo margine, indicato dalla variabile di ambiente N, specificata nel file .env (se N non è indicata, il margine è nullo).
+Si otterrà response con bad request, se non esiste un alimento con id \<food\>, o se 'quantity' non è positiva. Si avrà invece che l'ordine è fallito, 'state' passa a 'FALLITO', se: 'food' non corrisponde ad un alimento facente parte dell'ordine, o se non rispetta la sequenza di carico, oppure se la quantità caricata si discosta da quella richiesta oltre un certo margine, indicato dalla variabile di ambiente N, specificata nel file .env (se N non è indicata, il margine è nullo).
 
 ### GET /list
 Rotta che non richiede autorizzazione di alcun tipo, restituisce un json, 'loads' presenta un dizionario, che ha per chiavi gli id degli ordini con almeno un carico completato, e per valori i dati di tali carichi. Opzionalmente, si possono specificare come query parameters, 'start' ed 'end', data di inizio e fine del periodo entro il quale individuare il 'timestamp' dei carichi. Entrambe le date sono opzionali, e se ne può specificare anche una singola, in tal caso il periodo è considerato illimitato. La richiesta darà esito negativo se le date non sono nel formato 'DD-MM-YYYY' o'DD/MM/YYYY', oppure se la data di conclusione del periodo è precedente a quella d'inizio.
@@ -79,9 +79,9 @@ Rotta che non richiede autorizzazione di alcun tipo, restituisce un json, 'loads
 ### POST /admin/token
 ```
 {
-    "user": "<admin>",
-    "user_email": <user-destinazione>,
-    "tokens": <nuovo-numero-token>
+    "user": "\<admin\>",
+    "user_email": \<user-destinazione\>,
+    "tokens": \<nuovo-numero-token\>
 }
 ```
 Se "user" corrisponde ad un account con "role" Admin, "user_email" ad un account valido e  "tokens" non è negativo, il credito di token dell'utente identificato da "user_email", è aggiornato al nuovo valore "token".
@@ -126,7 +126,7 @@ cat jwtRS256.key.pub
 ```
 Generate le chiavi, creare il file .env, o se già esistente, verificare che sia della forma:
 ```
-N= <value>
+N= \<value\>
 PORT=8080
 HOST='0.0.0.0'
 ```
