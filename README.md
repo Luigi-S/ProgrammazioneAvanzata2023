@@ -34,9 +34,11 @@ Creazione di un nuovo alimento, per farlo si utilizza un token generato con un p
 Dove: 'user' identifica l'utente che esegue la richiesta, 'name' è il nome associato all'alimento, che non deve essere già impiegato e 'quantity' è il numero, positivo, che indica la quantità del nuovo alimento disponibile.
 
 ### PUT: /food/\<id\>
+![update_food_uml](uml/update_food.drawio.png)
 Aggiornare un alimento, identificato dal parametro \<id\>, il payload è analogo a quello per la creazione di un nuovo alimento, tuttavia sia 'name' che 'quantity' sono parametri opzionali, infatti, se non specificati, rimarranno inalterati. Valgono gli stessi criteri della POST per i valori dei parametri accettati, inoltre, la richiesta fallisce se nessuno dei due parametri è specificato.
 
 ### POST /order
+![create_order_uml](uml/create_order.drawio.png)
 Creazione di un nuovo ordine, prevede che si specifichi nel payload un array 'loads', composto dagli alimenti richiesti, identificati dal numero di id 'food' e dalla quantità richiesta, 'quantity'. Verrà restituito l'id dell'ordine, se correttamente creata l'istanza nel DB.
 ```
 {
@@ -53,6 +55,7 @@ Creazione di un nuovo ordine, prevede che si specifichi nel payload un array 'lo
 L'ordine è rifiutato se la quantità richiesta di un alimento è nulla, negativa o eccede le disponibilità dell'alimento associato, oppure se l'id dell'alimento non corrisponde ad un elemento a DB, o è ripetuto più volte nell'ordine. L'ordine è creato con stato 'CREATO', non è possibile effettuare i carichi fino all'effettivo inizio dell'esecuzione.
 
 ### POST /order/\<id\>
+![take_order_uml](uml/take_order.drawio.png)
 Presa in carico di un ordine, il payload include solo l'utente al quale verrà scalato il token, l'ordine corrispondente l'id indicato come parametro nella rotta è preso in carico, lo stato passa a 'IN ESECUZIONE' e sarà possibile eseguire i carichi con la rotta /load/\<id\>.
 ```
 {
@@ -61,9 +64,11 @@ Presa in carico di un ordine, il payload include solo l'utente al quale verrà s
 ```
 
 ### GET /order/\<id\>
+![get_order_uml](uml/get_order.drawio.png)
 Rotta che permette di verificare lo stato di esecuzione di un ordine specificandone l'\<id\> nella rotta. Se l'ordine è completato, ovvero se 'state' è 'COMPLETATO', saranno calcolate: la durata complessiva dell'ordine, ovvero la differenza fra 'start', il timestamp della presa in carico, e 'finish', quello dell'ultimo carico, inotre per ogni carico effettuato sarà calcolato lo scarto fra quantità caricata effettivamente, 'actual_q', e quella richiesta, 'requested_q'.
 
 ### POST /load/\<id\>
+![do_load_uml](uml/do_load.drawio.png)
 Effettua un carico relativo l'ordine identificato da \<id\>. Il payload è della forma:
 ```
 {
@@ -75,9 +80,11 @@ Effettua un carico relativo l'ordine identificato da \<id\>. Il payload è della
 Si otterrà response con bad request, se non esiste un alimento con id \<food\>, o se 'quantity' non è positiva. Si avrà invece che l'ordine è fallito, 'state' passa a 'FALLITO', se: 'food' non corrisponde ad un alimento facente parte dell'ordine, o se non rispetta la sequenza di carico, oppure se la quantità caricata si discosta da quella richiesta oltre un certo margine, indicato dalla variabile di ambiente N, specificata nel file .env (se N non è indicata, il margine è nullo).
 
 ### GET /list
+![get_list_uml](uml/get_list.drawio.png)
 Rotta che non richiede autorizzazione di alcun tipo, restituisce un json, 'loads' presenta un dizionario, che ha per chiavi gli id degli ordini con almeno un carico completato, e per valori i dati di tali carichi. Opzionalmente, si possono specificare come query parameters, 'start' ed 'end', data di inizio e fine del periodo entro il quale individuare il 'timestamp' dei carichi. Entrambe le date sono opzionali, e se ne può specificare anche una singola, in tal caso il periodo è considerato illimitato. La richiesta darà esito negativo se le date non sono nel formato 'DD-MM-YYYY' o'DD/MM/YYYY', oppure se la data di conclusione del periodo è precedente a quella d'inizio.
 
 ### POST /admin/token
+![update_token_uml](uml/update_token.drawio.png)
 ```
 {
     "user": "<admin>",

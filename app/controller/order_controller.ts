@@ -91,7 +91,7 @@ export function getOrderData(req:any, res:any, next:any){
             Users.payToken(req.body.user.email);
             let diff = '';
             if (order.finish && order.start){
-                diff = ((order.finish.getTime() - order.start.getTime()) / (1000*60*60)).toFixed(2) + ' ore';
+                diff = ((Date.parse(order.finish) - Date.parse(order.start)) / (1000*60*60*24)) + ' giorni';
             }
             res.status(HttpStatus.OK).json({orderid: order.id, duration: diff , loads: loads});
             next();
@@ -140,7 +140,6 @@ export function getOrderList(req:any, res:any, next:any){
         res.status(HttpStatus.OK).json({start: req.query.start, end: req.query.end, loads: retval});
         next();
     }).catch((err)=>{
-        console.log(err);
         next(Message.internal_server_error_message);
     });
 }

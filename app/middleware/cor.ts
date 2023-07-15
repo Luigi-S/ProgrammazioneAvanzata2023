@@ -58,8 +58,8 @@ export const validPeriod = [
 export const addLoad = [
     OrdersMiddleware.checkOrderExists,
     OrdersMiddleware.checkInExecution,
-    OrdersMiddleware.checkIfNext,
     OrdersMiddleware.checkFoodIdExists,
+    OrdersMiddleware.checkIfNext,
     OrdersMiddleware.checkActualQuantity
 ]
 

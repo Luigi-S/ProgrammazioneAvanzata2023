@@ -27,7 +27,7 @@ export function checkFoodExists (req: any, res: any, next: any): void{
             next(Message.unexisting_food_message);
         }
     }).catch((error) => { 
-        next(Message.malformed_payload_message);
+        next(Message.bad_request_msg);
     });
 }
 
@@ -42,6 +42,6 @@ export function checkFoodExistsByName (req: any, res: any, next: any): void{
             next(Message.already_existing_food_message);
         }
     }).catch((error) => { 
-        next(Message.malformed_payload_message);
+        next(Message.bad_request_msg);
     });
 }
