@@ -5,7 +5,11 @@ Progetto del corso di Programmazione Avanzata del 2022/23
 
 ### Requisiti
 
-Nel file requisites.docx sono riportate le richieste della consegna per l'applicazione.
+Nel file requisites.docx sono riportate le richieste della consegna per l'applicazione. L'applicazione dovrà occuparsi della gestione di carichi di alimenti, divisi in ordini, relativamente un magazzino di merce. Dovrà essere possibile creare dei record per ciascun alimento a magazzino, tenendo traccia della quantità disponibile per i vari alimenti a seguito dei carichi, ed aggiornare i dati per ogni alimento.
+Inoltre, l'utente dovrà poter creare dei nuovi ordini, con una sequenza ordinata di alimenti da prelevare, ed in che quantità. Successivamente ogni ordine avrà 4 possibili stati: 'CREATO', 'IN ESECUZIONE', 'FALLITO' o 'COMPLETATO'. Un nuovo ordine è 'CREATO', può quindi essere preso in carico, a questo punto è 'IN ESECUZIONE', e potranno essere effettuati i carichi ad esso relativi. Infine, un ordine è 'COMPLETATO', se ogni carico è effettuato nel giusto ordine, e in una quantità che non si discosta oltre un certo valore percentuale dal valore indicato in fase di creazione dell'ordine. Si avrà, in caso uno dei carichi violi questi criteri, che l'ordine è 'FALLITO', e non saranno accettati successive richieste di carico relativamente a tale ordine.
+
+Infine, sarà possibile consultare gli ordini in corso, come lista, senza autenticazione, e nello specifico di ciascun ordine, solo se autenticati.
+Gli utenti sono divisi in due categorie, Admin ed utenti qualsiasi, a ciascuno si associa un'email, che identifica l'utente, e un credito di token, associato al numero di richieste che l'utente può effettuare. Eventualmente, un utente admin potrà andare a impostare il totale dei token di un altro utente ad un nuovo valore non negativo.
 
 ### Rotte
 Nella tabella che segue, sono descritte le rotte implementate nell'applicazione, successivamente si descrive brevemente per ciascuna rotta, il funzionamento e come costruire la relativa richiesta.
