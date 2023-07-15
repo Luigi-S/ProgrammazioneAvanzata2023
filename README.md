@@ -22,7 +22,7 @@ Nella tabella che segue, sono descritte le rotte implementate nell'applicazione,
 |    POST    |/admin/token|     0     |
 
 ### POST: /food
-![create_food_uml](uml/create_food.png)
+![create_food_uml](uml/create_food.drawio.png)
 Creazione di un nuovo alimento, per farlo si utilizza un token generato con un payload JSON di questo tipo:
 ```
 {
