@@ -21,6 +21,8 @@ Nella tabella che segue, sono descritte le rotte implementate nell'applicazione,
 |    GET     |   /list    |     0     |
 |    POST    |/admin/token|     0     |
 
+Le rotte sono descritte con vari esempi in !pa_proj.postman_collection.json .
+
 ### POST: /food
 ![create_food_uml](uml/create_food.drawio.png)
 Creazione di un nuovo alimento, per farlo si utilizza un token generato con un payload JSON di questo tipo:
